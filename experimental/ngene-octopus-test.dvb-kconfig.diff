@@ -1,0 +1,13 @@
+--- ../linux/drivers/media/dvb/Kconfig	2011-02-25 05:45:17.000000000 +0100
++++ ngene-octopus-test/linux/drivers/media/dvb/Kconfig	2011-05-02 21:15:02.000000000 +0200
+@@ -80,6 +80,10 @@ comment "Supported nGene Adapters"
+ 	depends on DVB_CORE && PCI && I2C
+ 	source "drivers/media/dvb/ngene/Kconfig"
+ 
++comment "Supported DDBRIDGE Adapters"
++	depends on DVB_CORE && PCI && I2C
++	source "drivers/media/dvb/ddbridge/Kconfig"
++
+ comment "Supported DVB Frontends"
+ 	depends on DVB_CORE
+ source "drivers/media/dvb/frontends/Kconfig"

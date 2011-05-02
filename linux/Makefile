@@ -93,6 +93,7 @@ tar:
 untar: linux-media.tar.bz2
 	tar xfj linux-media.tar.bz2
 	-rm -f .patches_applied .linked_dir .git_log.md5
+	-../experimental/add-drivers
 
 clean:
 	-rm -rf $(MAINDIRS) .patches_applied .linked_dir .git_log.md5

@@ -1,0 +1,23 @@
+#/bin/bash
+
+fetch_hg_repo()
+{
+    if [ -d $2 ] ; then
+        (cd $2; hg update)
+    else
+        hg clone $1 $2
+    fi
+}
+
+
+cd ../experimental
+set -ev
+
+# Add ngene & octopus
+fetch_hg_repo "http://linuxtv.org/hg/~endriss/ngene-octopus-test" "ngene-octopus-test"
+rm -Rf ../linux/drivers/media/dvb/{ngene,ddbridge} ../linux/drivers/staging/cxd2099
+cp -r ngene-octopus-test/linux/drivers/media/dvb/{ngene,ddbridge} ../linux/drivers/media/dvb
+patch -p0 < ngene-octopus-test.dvb-kconfig.diff
+patch -p0 < ngene-octopus-test.dvb-makefile.diff
+
+# Drivers added successfully ;-)
