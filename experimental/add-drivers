@@ -3,7 +3,7 @@
 fetch_hg_repo()
 {
     if [ -d $2 ] ; then
-        (cd $2; hg update)
+        (cd $2; hg pull -u)
     else
         hg clone $1 $2
     fi
