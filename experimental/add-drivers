@@ -20,4 +20,12 @@ cp -r ngene-octopus-test/linux/drivers/media/dvb/{ngene,ddbridge} ../linux/drive
 patch -p0 < ngene-octopus-test.dvb-kconfig.diff
 patch -p0 < ngene-octopus-test.dvb-makefile.diff
 
+# Add TT DVB S2-6400
+fetch_hg_repo "http://powarman.dyndns.org/hg/v4l-dvb-saa716x" "v4l-dvb-saa716x"
+rm -Rf ../linux/drivers/media/common/saa716x
+cp -r v4l-dvb-saa716x/linux/drivers/media/common/saa716x  ../linux/drivers/media/common
+patch -p0 < saa716x.common-kconfig.diff
+patch -p0 < saa716x.common-makefile.diff
+patch -p0 < saa716x.include-osd.diff
+
 # Drivers added successfully ;-)
