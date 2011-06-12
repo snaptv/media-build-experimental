@@ -58,12 +58,12 @@ static inline unsigned long find_next_bit_le(const void *addr,
 #include <linux/ctype.h>
 static inline int hex_to_bin(char ch)
 {
-        if ((ch >= '0') && (ch <= '9'))
-                return ch - '0';
-        ch = tolower(ch);
-        if ((ch >= 'a') && (ch <= 'f'))
-                return ch - 'a' + 10;
-        return -1;
+	if ((ch >= '0') && (ch <= '9'))
+		return ch - '0';
+	ch = tolower(ch);
+	if ((ch >= 'a') && (ch <= 'f'))
+		return ch - 'a' + 10;
+	return -1;
 }
 #endif
 
@@ -310,17 +310,18 @@ do {									\
 	p->length = sz;							\
 	p->offset = off;						\
 } while (0)
+#endif
 
+#ifndef pr_err
 #define pr_err(fmt, arg...) \
 	printk(KERN_ERR fmt, ##arg)
 #endif
-
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,37)
 #define noop_llseek NULL
 #endif
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35)
+#ifndef pr_warn
 #define pr_warn(fmt, arg...) \
 	printk(KERN_WARNING fmt, ##arg)
 #endif
