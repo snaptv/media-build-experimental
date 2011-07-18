@@ -28,7 +28,6 @@ TARFILES += include/linux/videodev2.h
 TARFILES += include/linux/meye.h
 TARFILES += include/sound/tea575x-tuner.h
 TARFILES += include/sound/aci.h
-TARFILES += include/staging/altera.h
 TARFILES += include/linux/via-core.h
 TARFILES += include/linux/ti_wilink_st.h
 TARFILES += include/linux/media.h
@@ -63,7 +62,9 @@ todaytar:
 	-rm -f $(PWD)/$(TODAY_TAR).bz2
 	tar cf $(PWD)/$(TODAY_TAR) -C $(DIR) $(TARFILES)
 	git --git-dir $(DIR)/.git log --pretty=oneline -n3 |sed -r 's,([\x22]),,g; s,([\x25\x5c]),\x5c\\1,g' >git_log
-	tar rvf $(PWD)/$(TODAY_TAR) git_log
+	perl -e 'while (<>) { $$a=$$1 if (m/^\s*VERSION\s*=\s*(\d+)/); $$b=$$1 if (m/^\s*PATCHLEVEL\s*=\s*(\d+)/); $$c=$$1 if (m/^\s*SUBLEVEL\s*=\s*(\d+)/); } printf "#define V4L2_VERSION %d\n", ((($$a) << 16) + (($$b) << 8) + ($$c))' $(DIR)/Makefile > kernel_version.h
+	tar rvf $(PWD)/$(TODAY_TAR) git_log kernel_version.h
+
 	for i in $(TARDIR); do \
 		if [ "`echo $$i|grep Documentation`" = "" ]; then \
 			dir="`(cd $(DIR); find $$i -type f -name '*.[ch]')`"; \
@@ -80,7 +81,8 @@ tar:
 	-rm -f $(PWD)/linux-media.tar.bz2
 	tar cf $(PWD)/linux-media.tar -C $(DIR) $(TARFILES)
 	git --git-dir $(DIR)/.git log --pretty=oneline -n3 |sed -r 's,([\x22]),,g; s,([\x25\x5c]),\x5c\\1,g' >git_log
-	tar rvf $(PWD)/linux-media.tar git_log
+	perl -e 'while (<>) { $$a=$$1 if (m/^\s*VERSION\s*=\s*(\d+)/); $$b=$$1 if (m/^\s*PATCHLEVEL\s*=\s*(\d+)/); $$c=$$1 if (m/^\s*SUBLEVEL\s*=\s*(\d+)/); } printf "#define V4L2_VERSION %d\n", ((($$a) << 16) + (($$b) << 8) + ($$c))' $(DIR)/Makefile > kernel_version.h
+	tar rvf $(PWD)/linux-media.tar git_log kernel_version.h
 	for i in $(TARDIR); do \
 		if [ "`echo $$i|grep Documentation`" = "" ]; then \
 			dir="`(cd $(DIR); find $$i -type f -name '*.[ch]')`"; \
@@ -97,7 +99,7 @@ untar: linux-media.tar.bz2
 	-../experimental/add-drivers
 
 clean:
-	-rm -rf $(MAINDIRS) .patches_applied .linked_dir .git_log.md5
+	-rm -rf $(MAINDIRS) .patches_applied .linked_dir .git_log.md5 git_log kernel_version.h
 
 dir: clean
 	@lsdiff --version >/dev/null # Make 'make dir' fail if lsdiff is not installed
@@ -111,15 +113,13 @@ distclean: clean
 
 apply_patches apply-patches:
 	@if [ -e .linked_dir ]; then ./use_dir.pl --recheck --silent; fi
-	@if [ "$(KERNELRELEASE)" != "" ]; then \
-		if [ -e ../backports/v$(KERNELRELEASE)_series ]; then \
-			dir="v$(KERNELRELEASE)"; \
-		else \
-			dir="v$(VERSION).$(PATCHLEVEL).$(SUBLEVEL)"; \
-		fi; \
+	@if [ "$(VER)" != "" ]; then \
+		PATCHES="`./patches_for_kernel.pl $(VER)`"; \
+		if [ "$$PATCHES" = "" ]; then echo "Version $(VER) not supported"; exit -1; fi \
+	elif [ "$(KERNELRELEASE)" != "" ]; then \
+		PATCHES="`./patches_for_kernel.pl $(KERNELRELEASE)`"; \
+		if [ "$$PATCHES" = "" ]; then echo "Version $(KERNELRELEASE) not supported"; exit -1; fi \
 	fi; \
-	if [ "$(VER)" != "" ]; then dir="v$(VER)"; fi; \
-	if [ "$$dir" = "" ]; then echo "make $@ VER=<version>"; exit -1; fi; \
 	if [ -e .patches_applied ]; then \
 		if [ "`cat .patches_applied|grep ^#`" = "#$$dir" ]; then \
 			echo "Patches for $$dir already applied."; exit; \
@@ -127,10 +127,9 @@ apply_patches apply-patches:
 			$(MAKE) unapply_patches; \
 		fi; \
 	fi; \
-	if [ ! -e ../backports/$$dir_series ]; then echo "Version $$dir not supported."; exit 1; fi; \
 	echo "Applying patches for kernel $$dir"; \
 	touch .patches_applied; \
-	for i in `cat ../backports/$${dir}_series|grep -v '^#'`; do \
+	for i in $$PATCHES; do \
 		echo patch -s -f -N -p1 -i ../backports/$$i; \
 		patch -s -f -N -p1 -i ../backports/$$i --dry-run || exit 1; \
 		patch -s -f -N -p1 -i ../backports/$$i; \

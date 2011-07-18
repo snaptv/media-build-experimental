@@ -280,6 +280,33 @@ sub sync_all()
 	}
 }
 
+sub sync_kernel_version()
+{
+	my ($source_v4l_version, $a, $b, $c, $ver);
+
+	open IN, "$dir/Makefile" or die "Can't find $dir/Makefile";
+	while (<IN>) {
+		$a=$1 if (m/^\s*VERSION\s*=\s*(\d+)/);
+		$b=$1 if (m/^\s*PATCHLEVEL\s*=\s*(\d+)/);
+		$c=$1 if (m/^\s*SUBLEVEL\s*=\s*(\d+)/);
+	}
+	close IN;
+	$source_v4l_version = ((($a) << 16) + (($b) << 8) + ($c));
+
+	if (open IN, "kernel_version.h") {
+		while (<IN>) {
+			$ver=$1 if (m/^#define\s*V4L2_VERSION* \s*(\d+)/);
+		}
+		close IN;
+	}
+
+	if ($ver ne $source_v4l_version) {
+		open OUT,">kernel_version.h";
+		printf OUT "#define V4L2_VERSION %d\n", $source_v4l_version;
+		close OUT;
+	}
+}
+
 # Main
 
 if (!$dir) {
@@ -291,6 +318,7 @@ if (!$dir) {
 } else {
 	read_ctlfile();
 }
+sync_kernel_version();
 
 if ($path ne $dir) {
 	$path = $dir;
@@ -312,4 +340,4 @@ if ($get_patched && $patches_applied) {
 }
 
 write_ctlfile();
-system "git --git-dir $(DIR)/.git log --pretty=oneline -n3 |sed -r 's,([\x22]),,g; s,([\x25\x5c]),\x5c\\1,g' >git_log"
+system "git --git-dir $dir/.git log --pretty=oneline -n3 |sed -r 's,([\x22]),,g; s,([\x25\x5c]),\x5c\\1,g' >git_log"
