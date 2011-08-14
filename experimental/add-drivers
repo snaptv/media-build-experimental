@@ -14,15 +14,10 @@ cd ../experimental
 set -ev
 
 # Add ngene & octopus
-if grep ddbridge ../linux/drivers/media/dvb/Makefile &> /dev/null ; then
-    echo "*** Use ddbridge/ngene from media_build! ***"
-else
-    fetch_hg_repo "http://linuxtv.org/hg/~endriss/ngene-octopus-test" "ngene-octopus-test"
-    rm -Rf ../linux/drivers/media/dvb/{ngene,ddbridge} ../linux/drivers/staging/cxd2099
-    cp -r ngene-octopus-test/linux/drivers/media/dvb/{ngene,ddbridge} ../linux/drivers/media/dvb
-    patch -p0 < ngene-octopus-test.dvb-kconfig.diff
-    patch -p0 < ngene-octopus-test.dvb-makefile.diff
-fi
+fetch_hg_repo "http://linuxtv.org/hg/~endriss/ngene-octopus-test" "ngene-octopus-test"
+rm -Rf ../linux/drivers/media/dvb/{ddbridge,ngene} ../linux/drivers/staging/cxd2099
+cp -r ngene-octopus-test/linux/drivers/media/dvb/{ddbridge,ngene} ../linux/drivers/media/dvb/
+cp -r ngene-octopus-test/linux/drivers/staging/cxd2099 ../linux/drivers/staging/
 
 # Add TT DVB S2-6400
 fetch_hg_repo "http://powarman.dyndns.org/hg/v4l-dvb-saa716x" "v4l-dvb-saa716x"
