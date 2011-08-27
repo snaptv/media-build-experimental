@@ -334,11 +334,13 @@ $(obj)/.config: $(obj)/.version
 	@echo Updating/Creating .config
 	@if [ -e $(obj)/.config ]; then touch $(obj)/.config ; else \
 		$(MAKE) -C ../linux apply_patches; \
-		./scripts/make_kconfig.pl $(OUTDIR) $(SRCDIR); fi
+		./scripts/make_kconfig.pl $(OUTDIR) $(SRCDIR); \
+		../experimental/update_kconfig.pl; fi
 
 $(obj)/Kconfig: $(obj)/.version
 	@$(MAKE) -C ../linux apply_patches
 	./scripts/make_kconfig.pl $(OUTDIR) $(SRCDIR)
+	../experimental/update_kconfig.pl
 
 # With make -j, it's possible that both the .config and Kconfig rules
 # will run at the same time, running make_kconfig.pl twice.  There
@@ -365,11 +367,13 @@ allyesconfig allmodconfig:: $(obj)/.version
 	@$(MAKE) -C ../linux apply_patches
 	./scripts/make_kconfig.pl $(OUTDIR) $(SRCDIR) 1
 	./scripts/fix_kconfig.pl
+	../experimental/update_kconfig.pl
 
 stagingconfig:: $(obj)/.version
 	@$(MAKE) -C ../linux apply_patches
 	./scripts/make_kconfig.pl $(OUTDIR) $(SRCDIR) 1 1
 	./scripts/fix_kconfig.pl
+	../experimental/update_kconfig.pl
 
 # rule to build kernel conf programs
 KMAKEVARS := config-targets=1 mixed-targets=0 dot-config=0 SRCDIR=$(SRCDIR)
