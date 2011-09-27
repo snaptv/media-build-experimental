@@ -1,3 +1,9 @@
 .git
-patches/
-.pc
+linux/drivers
+linux/firmware
+linux/include
+linux/sound
+linux/.patches_applied
+linux/kernel_version.h
+linux/linux-media.tar.bz2
+v4l/.config.old
