@@ -20,15 +20,15 @@ cp -r ngene-octopus-test/linux/drivers/media/dvb/{ddbridge,ngene} ../linux/drive
 cp -r ngene-octopus-test/linux/drivers/staging/cxd2099 ../linux/drivers/staging/
 cp ngene-octopus-test/linux/drivers/media/dvb/frontends/tda18212dd* ../linux/drivers/media/dvb/frontends/
 cp ngene-octopus-test/linux/drivers/media/dvb/frontends/stv0367dd*  ../linux/drivers/media/dvb/frontends/
-patch -p0 < stv0367dd-tda18212dd.frontend-kconfig.diff
-patch -p0 < stv0367dd-tda18212dd.frontend-makefile.diff
+patch -d.. -p0 < stv0367dd-tda18212dd.frontend-kconfig.diff
+patch -d.. -p0 < stv0367dd-tda18212dd.frontend-makefile.diff
 
 # Add TT DVB S2-6400
 fetch_hg_repo "http://powarman.dyndns.org/hg/v4l-dvb-saa716x" "v4l-dvb-saa716x"
 rm -Rf ../linux/drivers/media/common/saa716x
 cp -r v4l-dvb-saa716x/linux/drivers/media/common/saa716x  ../linux/drivers/media/common
-patch -p0 < saa716x.common-kconfig.diff
-patch -p0 < saa716x.common-makefile.diff
-patch -p0 < saa716x.include-osd.diff
+patch -d.. -p0 < saa716x.common-kconfig.diff
+patch -d.. -p0 < saa716x.common-makefile.diff
+patch -d.. -p0 < saa716x.include-osd.diff
 
 # Drivers added successfully ;-)

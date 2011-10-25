@@ -1,6 +1,5 @@
-diff -pu ../linux/include/linux/dvb/osd.h v4l-dvb-saa716x/linux/include/linux/dvb/osd.h
---- ../linux/include/linux/dvb/osd.h	2010-07-03 23:22:13.000000000 +0200
-+++ v4l-dvb-saa716x/linux/include/linux/dvb/osd.h	2011-05-03 02:36:52.000000000 +0200
+--- linux/include/linux/dvb/osd.h	2010-07-03 23:22:13.000000000 +0200
++++ experimental/v4l-dvb-saa716x/linux/include/linux/dvb/osd.h	2011-05-03 02:36:52.000000000 +0200
 @@ -141,4 +141,20 @@ typedef struct osd_cap_s {
  #define OSD_SEND_CMD            _IOW('o', 160, osd_cmd_t)
  #define OSD_GET_CAPABILITY      _IOR('o', 161, osd_cap_t)
