@@ -15,9 +15,9 @@ set -ev
 
 # Add ngene & octopus
 fetch_hg_repo "http://linuxtv.org/hg/~endriss/ngene-octopus-test" "ngene-octopus-test"
-rm -Rf ../linux/drivers/media/dvb/{ddbridge,ngene} ../linux/drivers/staging/cxd2099
+rm -Rf ../linux/drivers/media/dvb/{ddbridge,ngene} ../linux/drivers/staging/media/cxd2099 ../linux/drivers/staging/cxd2099
 cp -r ngene-octopus-test/linux/drivers/media/dvb/{ddbridge,ngene} ../linux/drivers/media/dvb/
-cp -r ngene-octopus-test/linux/drivers/staging/cxd2099 ../linux/drivers/staging/
+cp -r ngene-octopus-test/linux/drivers/staging/cxd2099 ../linux/drivers/staging/media/
 cp ngene-octopus-test/linux/drivers/media/dvb/frontends/tda18212dd* ../linux/drivers/media/dvb/frontends/
 cp ngene-octopus-test/linux/drivers/media/dvb/frontends/stv0367dd*  ../linux/drivers/media/dvb/frontends/
 patch -d.. -p0 < stv0367dd-tda18212dd.frontend-kconfig.diff
