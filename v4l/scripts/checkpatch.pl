@@ -1378,9 +1378,9 @@ sub process {
 		if ($line =~ /^\+/ && $prevrawline !~ /\/\*\*/ &&
 		    $rawline !~ /^.\s*\*\s*\@$Ident\s/ &&
 		    $line !~ /^\+\s*printk\s*\(\s*(?:KERN_\S+\s*)?"[X\t]*"\s*(?:,|\)\s*;)\s*$/ &&
-		    $length > 80)
+		    $length > 256)
 		{
-			WARN("line over 80 characters\n" . $herecurr);
+			WARN("line over 256 characters\n" . $herecurr);
 		}
 
 # check for adding lines without a newline.

@@ -1,5 +1,6 @@
 # Use this for stuff for drivers that don't compile
 [3.255.255]
+USB_GSPCA
 
 [3.0.0]
 # fw_iso_context_queue_flush
