@@ -31,4 +31,7 @@ patch -d.. -p0 < saa716x.common-kconfig.diff
 patch -d.. -p0 < saa716x.common-makefile.diff
 patch -d.. -p0 < saa716x.include-osd.diff
 
+# Quick fix: Create dummy export.h if it does not exist
+touch ../linux/include/linux/export.h
+
 # Drivers added successfully ;-)
