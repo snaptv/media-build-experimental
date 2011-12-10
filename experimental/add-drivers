@@ -3,7 +3,7 @@
 fetch_hg_repo()
 {
     if [ -d $2 ] ; then
-        (cd $2; hg pull -u)
+        (cd $2; hg pull -u $1)
     else
         hg clone $1 $2
     fi
@@ -24,7 +24,7 @@ patch -d.. -p0 < stv0367dd-tda18212dd.frontend-kconfig.diff
 patch -d.. -p0 < stv0367dd-tda18212dd.frontend-makefile.diff
 
 # Add TT DVB S2-6400
-fetch_hg_repo "http://powarman.dyndns.org/hg/v4l-dvb-saa716x" "v4l-dvb-saa716x"
+fetch_hg_repo "http://powarman.dyndns.org/hg/v4l-dvb-saa716x" "v4l-dvb-saa716x" || fetch_hg_repo "http://linuxtv.org/hg/~endriss/mirror-saa716x" "v4l-dvb-saa716x"
 rm -Rf ../linux/drivers/media/common/saa716x
 cp -r v4l-dvb-saa716x/linux/drivers/media/common/saa716x  ../linux/drivers/media/common
 patch -d.. -p0 < saa716x.common-kconfig.diff
