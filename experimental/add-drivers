@@ -31,7 +31,10 @@ patch -d.. -p0 < saa716x.common-kconfig.diff
 patch -d.. -p0 < saa716x.common-makefile.diff
 patch -d.. -p0 < saa716x.include-osd.diff
 
-# Quick fix: Create dummy export.h if it does not exist
+# Quick fix: Create dummy export.h if it does not exist.
 touch ../linux/include/linux/export.h
+
+# Preliminary patch: Provide stv090x BER/UCB stats.
+patch -d.. -p0 < stv090x_ucblocks_ber.diff
 
 # Drivers added successfully ;-)
