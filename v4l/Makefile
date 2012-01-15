@@ -180,8 +180,6 @@ ifeq ($(inst-m),)
   inst-m	:= $(obj-m)
 endif
 
-v4l_modules := $(shell /sbin/lsmod|cut -d' ' -f1 ) $(patsubst %.ko,%,$(inst-m))
-
 #################################################
 # locales seem to cause trouble sometimes.
 LC_ALL = POSIX
