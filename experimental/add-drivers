@@ -34,4 +34,7 @@ patch -d.. -p0 < saa716x.include-osd.diff
 # Preliminary patch: Provide stv090x BER/UCB stats.
 patch -d.. -p0 < stv090x_ucblocks_ber.diff
 
+# Preliminary patch: Remove lock status warning.
+patch -d.. -p0 < drxk_lockstatus_fix.diff
+
 # Drivers added successfully ;-)
