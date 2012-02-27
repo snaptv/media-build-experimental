@@ -34,6 +34,9 @@ patch -d.. -p0 < saa716x.include-osd.diff
 # Preliminary patch: Provide stv090x BER/UCB stats.
 patch -d.. -p0 < stv090x_ucblocks_ber.diff
 
+# Preliminary patch: Do not access registers of second path on stv0903.
+patch -d../linux -p1 < stv090x_stv0903_not_set_registers_of_second_path.diff
+
 # Preliminary patch: Remove lock status warning.
 patch -d.. -p0 < drxk_lockstatus_fix.diff
 
