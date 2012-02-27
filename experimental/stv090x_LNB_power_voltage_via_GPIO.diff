@@ -1,0 +1,139 @@
+# HG changeset patch
+# User Andreas Regel <andreas.regel@gmx.de>
+# Date 1330262613 -3600
+# Node ID aed050c399876484a775f3829146a9432d819937
+# Parent  a0236d8e50a69803087aa44c3a1e1f0053289c65
+stv090x: Add functions to set LNB power voltage via GPIO.
+
+On some cards the LNB SEC is controlled using the GPIO ports of the
+STV090x. This patch adds support for it. The port are configured via
+stv090x_config structure.
+
+Signed-off-by: Andreas Regel <andreas.regel@gmx.de>
+
+diff -r a0236d8e50a6 -r aed050c39987 linux/drivers/media/dvb/frontends/stv090x.c
+--- a/linux/drivers/media/dvb/frontends/stv090x.c	Sun Feb 26 12:19:08 2012 +0100
++++ b/linux/drivers/media/dvb/frontends/stv090x.c	Sun Feb 26 14:23:33 2012 +0100
+@@ -5659,6 +5659,100 @@
+ 	return -1;
+ }
+ 
++static int stv090x_set_voltage(struct dvb_frontend *fe,
++			       enum fe_sec_voltage voltage)
++{
++	struct stv090x_state *state = fe->demodulator_priv;
++	const struct stv090x_config *config = state->config;
++	u16 reg;
++	u8 en = 0;
++	u8 sel = 0;
++
++	switch (voltage) {
++	case SEC_VOLTAGE_OFF:
++		/* EN = 0 */
++		en = 0x00;
++		break;
++
++	case SEC_VOLTAGE_13:
++		/* EN = 1, SEL = 0 */
++		en = 0x02;
++		sel = 0x00;
++		break;
++
++	case SEC_VOLTAGE_18:
++		/* EN = 1, SEL = 1 */
++		en = 0x02;
++		sel = 0x02;
++		break;
++
++	default:
++		break;
++	}
++
++	if (config->gpio_voltage_enable) {
++
++		if (config->gpio_voltage_enable > 0)
++			reg = STV090x_GPIOxCFG(config->gpio_voltage_enable);
++		else {
++			reg = STV090x_GPIOxCFG(-config->gpio_voltage_enable);
++			en |= 0x01;
++		}
++
++		if (stv090x_write_reg(state, reg, en) < 0)
++			goto err;
++	}
++
++	if (config->gpio_voltage_select) {
++
++		if (config->gpio_voltage_select > 0)
++			reg = STV090x_GPIOxCFG(config->gpio_voltage_select);
++		else {
++			reg = STV090x_GPIOxCFG(-config->gpio_voltage_select);
++			sel |= 0x01;
++		}
++
++		if (stv090x_write_reg(state, reg, sel) < 0)
++			goto err;
++	}
++
++	return 0;
++err:
++	dprintk(FE_ERROR, 1, "I/O error");
++	return -1;
++}
++
++static int stv090x_voltage_boost(struct dvb_frontend *fe, long arg)
++{
++	struct stv090x_state *state = fe->demodulator_priv;
++	const struct stv090x_config *config = state->config;
++	u16 reg;
++	u8 value;
++
++	if (config->gpio_voltage_boost) {
++
++		if (arg)
++			value = 0x02;
++		else
++			value = 0x00;
++
++		if (config->gpio_voltage_boost > 0)
++			reg = STV090x_GPIOxCFG(config->gpio_voltage_boost);
++		else {
++			reg = STV090x_GPIOxCFG(-config->gpio_voltage_boost);
++			value |= 0x01;
++		}
++
++		if (stv090x_write_reg(state, reg, value) < 0)
++			goto err;
++	}
++
++	return 0;
++err:
++	dprintk(FE_ERROR, 1, "I/O error");
++	return -1;
++}
++
+ static struct dvb_frontend_ops stv090x_ops = {
+ 
+ 	.info = {
+@@ -5686,6 +5780,8 @@
+ 	.diseqc_send_burst		= stv090x_send_diseqc_burst,
+ 	.diseqc_recv_slave_reply	= stv090x_recv_slave_reply,
+ 	.set_tone			= stv090x_set_tone,
++	.set_voltage			= stv090x_set_voltage,
++	.enable_high_lnb_voltage	= stv090x_voltage_boost,
+ 
+ 	.search				= stv090x_search,
+ 	.read_status			= stv090x_read_status,
+diff -r a0236d8e50a6 -r aed050c39987 linux/drivers/media/dvb/frontends/stv090x.h
+--- a/linux/drivers/media/dvb/frontends/stv090x.h	Sun Feb 26 12:19:08 2012 +0100
++++ b/linux/drivers/media/dvb/frontends/stv090x.h	Sun Feb 26 14:23:33 2012 +0100
+@@ -85,6 +85,9 @@
+ 	enum stv090x_adc_range	adc2_range; /* default: 2Vpp */
+ 
+ 	bool diseqc_envelope_mode;
++	s8 gpio_voltage_enable;
++	s8 gpio_voltage_select;
++	s8 gpio_voltage_boost;
+ 
+ 	int (*tuner_init) (struct dvb_frontend *fe);
+ 	int (*tuner_sleep) (struct dvb_frontend *fe);
