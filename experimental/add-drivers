@@ -22,6 +22,7 @@ cp ngene-octopus-test/linux/drivers/media/dvb/frontends/tda18212dd* ../linux/dri
 cp ngene-octopus-test/linux/drivers/media/dvb/frontends/stv0367dd*  ../linux/drivers/media/dvb/frontends/
 patch -d.. -p0 < stv0367dd-tda18212dd.frontend-kconfig.diff
 patch -d.. -p0 < stv0367dd-tda18212dd.frontend-makefile.diff
+cp -r drxk/* ../linux/drivers/media/dvb/frontends/
 
 # Add TT DVB S2-6400
 fetch_hg_repo "http://powarman.dyndns.org/hg/v4l-dvb-saa716x" "v4l-dvb-saa716x" || fetch_hg_repo "http://linuxtv.org/hg/~endriss/mirror-saa716x" "v4l-dvb-saa716x"
