@@ -32,15 +32,11 @@ patch -d.. -p0 < saa716x.common-kconfig.diff
 patch -d.. -p0 < saa716x.common-makefile.diff
 patch -d.. -p0 < saa716x.include-osd.diff
 
-# Preliminary patch: Provide stv090x BER/UCB stats.
-patch -d.. -p0 < stv090x_ucblocks_ber.diff
+for i in patch.d/*diff ;
+do
+    echo
+    echo "Applying '$i'"
+    patch -d.. -p0 < $i
+done
 
-# Preliminary patch: Do not access registers of second path on stv0903.
-patch -d../linux -p1 < stv090x_stv0903_not_set_registers_of_second_path.diff
-
-# Preliminary patch: Remove lock status warning.
-patch -d.. -p0 < drxk_lockstatus_fix.diff
-
-# Preliminary patch: Remove qam_demod_parameter_count.
-patch -d.. -p0 < em28xx_remove_parmcnt.diff
 # Drivers added successfully ;-)
