@@ -68,6 +68,7 @@ V4L2_MEM2MEM_DEV
 RADIO_MIROPCM20
 # Problem with printk_ratelimited
 DVB_PT1
+VIDEO_STK1160
 
 [2.6.32]
 # These rely on arch support that wasn't available until 2.6.32
