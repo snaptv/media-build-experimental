@@ -1,0 +1,38 @@
+# HG changeset patch
+# User Soeren Moch
+# Date 1343922852 -7200
+# Node ID 4af43518686743e1946ea9ee7a4ff7eff0064bfd
+# Parent  607ff34c6a391600749d11de7cd5b36cddf172e0
+include fix for in-kernel build
+
+diff -r 607ff34c6a39 -r 4af435186867 linux/drivers/media/common/saa716x/Makefile
+--- a/linux/drivers/media/common/saa716x/Makefile	Thu Aug 02 16:43:49 2012 +0200
++++ b/linux/drivers/media/common/saa716x/Makefile	Thu Aug 02 17:54:12 2012 +0200
+@@ -23,4 +23,4 @@
+ obj-$(CONFIG_DVB_SAA716X_HYBRID)  += saa716x_hybrid.o
+ obj-$(CONFIG_DVB_SAA716X_FF)	  += saa716x_ff.o
+ 
+-EXTRA_CFLAGS = -Idrivers/media/dvb/dvb-core/
++EXTRA_CFLAGS = -Idrivers/media/dvb/dvb-core/ -Idrivers/media/dvb/frontends/
+diff -r 607ff34c6a39 -r 4af435186867 linux/drivers/media/common/saa716x/saa716x_dma.c
+--- a/linux/drivers/media/common/saa716x/saa716x_dma.c	Thu Aug 02 16:43:49 2012 +0200
++++ b/linux/drivers/media/common/saa716x/saa716x_dma.c	Thu Aug 02 17:54:12 2012 +0200
+@@ -1,6 +1,7 @@
+ #include <linux/kernel.h>
+ #include <linux/pci.h>
+ #include <linux/scatterlist.h>
++#include <linux/vmalloc.h>
+ #include <asm/page.h>
+ #include <asm/pgtable.h>
+ 
+diff -r 607ff34c6a39 -r 4af435186867 linux/drivers/media/common/saa716x/saa716x_ff.h
+--- a/linux/drivers/media/common/saa716x/saa716x_ff.h	Thu Aug 02 16:43:49 2012 +0200
++++ b/linux/drivers/media/common/saa716x/saa716x_ff.h	Thu Aug 02 17:54:12 2012 +0200
+@@ -3,6 +3,7 @@
+ 
+ #include "dvb_filter.h"
+ #include "dvb_ringbuffer.h"
++#include <linux/version.h>
+ 
+ #define TECHNOTREND			0x13c2
+ #define S2_6400_DUAL_S2_PREMIUM_DEVEL	0x3009
