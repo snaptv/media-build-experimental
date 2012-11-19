@@ -1,8 +1,8 @@
 ---
 diff --git a/drivers/media/common/tuners/tuner-xc2028.c b/drivers/media/common/tuners/tuner-xc2028.c
 index f88f948..8591799 100644
---- a/drivers/media/common/tuners/tuner-xc2028.c
-+++ b/drivers/media/common/tuners/tuner-xc2028.c
+--- a/drivers/media/tuners/tuner-xc2028.c
++++ b/drivers/media/tuners/tuner-xc2028.c
 @@ -1408,7 +1408,6 @@ static int xc2028_set_config(struct dvb_frontend *fe, void *priv_cfg)
  		rc = request_firmware_nowait(THIS_MODULE, 1,
  					     priv->fname,
