@@ -1,6 +1,6 @@
---- linux/drivers/media/dvb/frontends/Makefile	2011-09-24 05:45:14.000000000 +0200
+--- linux/drivers/media/dvb-frontends/Makefile	2011-09-24 05:45:14.000000000 +0200
 +++ xxx/Makefile	2011-10-23 20:42:16.000000000 +0200
-@@ -92,6 +92,8 @@ obj-$(CONFIG_DVB_STV0367) += stv0367.o
+@@ -95,6 +95,8 @@ obj-$(CONFIG_DVB_STV0367) += stv0367.o
  obj-$(CONFIG_DVB_CXD2820R) += cxd2820r.o
  obj-$(CONFIG_DVB_DRXK) += drxk.o
  obj-$(CONFIG_DVB_TDA18271C2DD) += tda18271c2dd.o

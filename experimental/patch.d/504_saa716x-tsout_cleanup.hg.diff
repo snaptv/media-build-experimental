@@ -5,9 +5,9 @@
 # Parent  0766d1c37f7b438cca89e4696add3fbb0e7b563b
 ts output buffer cleanup
 
-diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/common/saa716x/saa716x_ff.h
---- a/linux/drivers/media/common/saa716x/saa716x_ff.h	Thu Aug 02 19:26:55 2012 +0200
-+++ b/linux/drivers/media/common/saa716x/saa716x_ff.h	Wed Oct 03 23:18:03 2012 +0200
+diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff.h
+--- a/linux/drivers/media/pci/saa716x/saa716x_ff.h	Thu Aug 02 19:26:55 2012 +0200
++++ b/linux/drivers/media/pci/saa716x/saa716x_ff.h	Wed Oct 03 23:18:03 2012 +0200
 @@ -91,7 +91,10 @@
  #define MAX_DATA_LEN		(1024 * 1024)
  
@@ -29,9 +29,9 @@ diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/common/saa716x/saa716x_
  
  	struct workqueue_struct *fifo_workq;
  	struct work_struct	fifo_work;
-diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/common/saa716x/saa716x_ff_cmd.c
---- a/linux/drivers/media/common/saa716x/saa716x_ff_cmd.c	Thu Aug 02 19:26:55 2012 +0200
-+++ b/linux/drivers/media/common/saa716x/saa716x_ff_cmd.c	Wed Oct 03 23:18:03 2012 +0200
+diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff_cmd.c
+--- a/linux/drivers/media/pci/saa716x/saa716x_ff_cmd.c	Thu Aug 02 19:26:55 2012 +0200
++++ b/linux/drivers/media/pci/saa716x/saa716x_ff_cmd.c	Wed Oct 03 23:18:03 2012 +0200
 @@ -33,7 +33,7 @@
  	sti7109->osd_result_avail = 0;
  
@@ -41,9 +41,9 @@ diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/common/saa716x/saa716x_
  	init_waitqueue_head(&sti7109->data_ready_wq);
  	sti7109->data_ready = 0;
  	init_waitqueue_head(&sti7109->block_done_wq);
-diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/common/saa716x/saa716x_ff_main.c
---- a/linux/drivers/media/common/saa716x/saa716x_ff_main.c	Thu Aug 02 19:26:55 2012 +0200
-+++ b/linux/drivers/media/common/saa716x/saa716x_ff_main.c	Wed Oct 03 23:18:03 2012 +0200
+diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff_main.c
+--- a/linux/drivers/media/pci/saa716x/saa716x_ff_main.c	Thu Aug 02 19:26:55 2012 +0200
++++ b/linux/drivers/media/pci/saa716x/saa716x_ff_main.c	Wed Oct 03 23:18:03 2012 +0200
 @@ -492,6 +492,46 @@
  	return 0;
  }

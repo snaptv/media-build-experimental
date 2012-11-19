@@ -10,13 +10,13 @@ STV0903.
 
 Signed-off-by: Andreas Regel <andreas.regel@gmx.de>
 ---
- linux/drivers/media/dvb/frontends/stv090x.c |  141 ++++++++++++++++++++++++++++++--
+ linux/drivers/media/dvb-frontends/stv090x.c |  141 ++++++++++++++++++++++++++++++--
  1 files changed, 132 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/media/dvb/frontends/stv090x.c b/drivers/media/dvb/frontends/stv090x.c
+diff --git a/drivers/media/dvb-frontends/stv090x.c b/drivers/media/dvb-frontends/stv090x.c
 index afbd50c..ce064a3 100644
---- linux/drivers/media/dvb/frontends/stv090x.c
-+++ linux/drivers/media/dvb/frontends/stv090x.c
+--- linux/drivers/media/dvb-frontends/stv090x.c
++++ linux/drivers/media/dvb-frontends/stv090x.c
 @@ -4268,7 +4268,7 @@ err:
  	return -1;
  }

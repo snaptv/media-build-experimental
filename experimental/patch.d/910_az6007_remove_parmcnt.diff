@@ -1,5 +1,5 @@
---- linux/drivers/media/dvb/dvb-usb-v2/az6007.c.org	2012-08-07 05:45:22.000000000 +0200
-+++ linux/drivers/media/dvb/dvb-usb-v2/az6007.c	2012-08-10 20:46:12.000000000 +0200
+--- linux/drivers/media/usb/dvb-usb-v2/az6007.c.org	2012-08-07 05:45:22.000000000 +0200
++++ linux/drivers/media/usb/dvb-usb-v2/az6007.c	2012-08-10 20:46:12.000000000 +0200
 @@ -64,7 +64,6 @@ static struct drxk_config terratec_h7_dr
  	.no_i2c_bridge = false,
  	.chunk_size = 64,

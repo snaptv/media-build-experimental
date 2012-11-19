@@ -4,8 +4,8 @@ From: Oliver Endriss <o.endriss@gmx.de>
 
 Signed-off-by: Oliver Endriss <o.endriss@gmx.de>
 
---- linux/drivers/media/dvb/frontends/stv090x.c	2011-09-26 04:44:56.000000000 +0200
-+++ new/drivers/media/dvb/frontends/stv090x.c	2011-12-17 14:52:05.000000000 +0100
+--- linux/drivers/media/dvb-frontends/stv090x.c	2011-09-26 04:44:56.000000000 +0200
++++ new/drivers/media/dvb-frontends/stv090x.c	2011-12-17 14:52:05.000000000 +0100
 @@ -3512,6 +3512,7 @@ static int stv090x_read_status(struct dv
  	return 0;
  }

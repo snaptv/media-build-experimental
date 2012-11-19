@@ -5,9 +5,9 @@
 # Parent  4af43518686743e1946ea9ee7a4ff7eff0064bfd
 run fifo_worker in work_queue, not as tasklet, to avoid heavy (soft-)interrupt load on slow CPUs
 
-diff -r 4af435186867 -r 43cfee237476 linux/drivers/media/common/saa716x/saa716x_ff.h
---- a/linux/drivers/media/common/saa716x/saa716x_ff.h	Thu Aug 02 17:54:12 2012 +0200
-+++ b/linux/drivers/media/common/saa716x/saa716x_ff.h	Thu Aug 02 19:26:55 2012 +0200
+diff -r 4af435186867 -r 43cfee237476 linux/drivers/media/pci/saa716x/saa716x_ff.h
+--- a/linux/drivers/media/pci/saa716x/saa716x_ff.h	Thu Aug 02 17:54:12 2012 +0200
++++ b/linux/drivers/media/pci/saa716x/saa716x_ff.h	Thu Aug 02 19:26:55 2012 +0200
 @@ -4,6 +4,7 @@
  #include "dvb_filter.h"
  #include "dvb_ringbuffer.h"
@@ -26,9 +26,9 @@ diff -r 4af435186867 -r 43cfee237476 linux/drivers/media/common/saa716x/saa716x_
  
  	wait_queue_head_t	boot_finish_wq;
  	int			boot_finished;
-diff -r 4af435186867 -r 43cfee237476 linux/drivers/media/common/saa716x/saa716x_ff_main.c
---- a/linux/drivers/media/common/saa716x/saa716x_ff_main.c	Thu Aug 02 17:54:12 2012 +0200
-+++ b/linux/drivers/media/common/saa716x/saa716x_ff_main.c	Thu Aug 02 19:26:55 2012 +0200
+diff -r 4af435186867 -r 43cfee237476 linux/drivers/media/pci/saa716x/saa716x_ff_main.c
+--- a/linux/drivers/media/pci/saa716x/saa716x_ff_main.c	Thu Aug 02 17:54:12 2012 +0200
++++ b/linux/drivers/media/pci/saa716x/saa716x_ff_main.c	Thu Aug 02 19:26:55 2012 +0200
 @@ -492,10 +492,10 @@
  	return 0;
  }
