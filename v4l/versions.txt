@@ -2,8 +2,8 @@
 [3.255.255]
 USB_GSPCA
 
-[3.5.0]
-# needs devm_clk_get
+[3.6.0]
+# needs devm_clk_get, clk_enable, clk_disable
 VIDEO_CODA
 
 [3.3.0]
