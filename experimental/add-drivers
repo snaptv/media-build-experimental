@@ -7,6 +7,8 @@ fetch_hg_repo()
     else
         hg clone $1 $2
     fi
+
+    hg tip -R $2 --template "$2: {node} {desc|firstline}\n" >> ../linux/git_log
 }
 
 apply_patch()
@@ -19,6 +21,8 @@ apply_patch()
 
 
 cd ../experimental
+hg tip --template "experimental: {node} {desc|firstline}\n" >> ../linux/git_log
+
 set -ev
 
 # Add ngene & octopus
