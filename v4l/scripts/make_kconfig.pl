@@ -16,7 +16,8 @@ my ($version, $level, $sublevel, $kernver);
 my $kernel = shift;
 my $kernsrc = shift;
 my $force_kconfig = shift;
-my $enable_staging = shift;
+#my $enable_staging = shift;
+my $enable_staging = 1;
 
 my $debug=0;
 
