@@ -1,0 +1,11 @@
+--- linux/drivers/media/dvb-core/dvb_frontend.c.org	2012-11-24 18:05:13.000000000 +0100
++++ linux/drivers/media/dvb-core/dvb_frontend.c	2012-11-24 18:05:37.000000000 +0100
+@@ -2321,7 +2321,7 @@ static unsigned int dvb_frontend_poll(st
+ 	struct dvb_frontend *fe = dvbdev->priv;
+ 	struct dvb_frontend_private *fepriv = fe->frontend_priv;
+ 
+-	dev_dbg_ratelimited(fe->dvb->device, "%s:\n", __func__);
++	dev_dbg(fe->dvb->device, "%s:\n", __func__);
+ 
+ 	poll_wait (file, &fepriv->events.wait_queue, wait);
+ 
