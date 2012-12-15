@@ -1,11 +1,11 @@
 # HG changeset patch
 # User Soeren Moch
 # Date 1349299083 -7200
-# Node ID 66c2426f656f6f5084783b82b6960c951521e3cf
+# Node ID 96557c86ef251d5bdc33d197419e3f87d2ce86a6
 # Parent  0766d1c37f7b438cca89e4696add3fbb0e7b563b
 ts output buffer cleanup
 
-diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff.h
+diff -r 0766d1c37f7b -r 96557c86ef25 linux/drivers/media/common/saa716x/saa716x_ff.h
 --- a/linux/drivers/media/pci/saa716x/saa716x_ff.h	Thu Aug 02 19:26:55 2012 +0200
 +++ b/linux/drivers/media/pci/saa716x/saa716x_ff.h	Wed Oct 03 23:18:03 2012 +0200
 @@ -91,7 +91,10 @@
@@ -29,7 +29,7 @@ diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff.
  
  	struct workqueue_struct *fifo_workq;
  	struct work_struct	fifo_work;
-diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff_cmd.c
+diff -r 0766d1c37f7b -r 96557c86ef25 linux/drivers/media/common/saa716x/saa716x_ff_cmd.c
 --- a/linux/drivers/media/pci/saa716x/saa716x_ff_cmd.c	Thu Aug 02 19:26:55 2012 +0200
 +++ b/linux/drivers/media/pci/saa716x/saa716x_ff_cmd.c	Wed Oct 03 23:18:03 2012 +0200
 @@ -33,7 +33,7 @@
@@ -41,7 +41,7 @@ diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff_
  	init_waitqueue_head(&sti7109->data_ready_wq);
  	sti7109->data_ready = 0;
  	init_waitqueue_head(&sti7109->block_done_wq);
-diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff_main.c
+diff -r 0766d1c37f7b -r 96557c86ef25 linux/drivers/media/common/saa716x/saa716x_ff_main.c
 --- a/linux/drivers/media/pci/saa716x/saa716x_ff_main.c	Thu Aug 02 19:26:55 2012 +0200
 +++ b/linux/drivers/media/pci/saa716x/saa716x_ff_main.c	Wed Oct 03 23:18:03 2012 +0200
 @@ -492,6 +492,46 @@
@@ -184,13 +184,14 @@ diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff_
  			mask |= (POLLOUT | POLLWRNORM);
  	}
  
-@@ -605,19 +646,22 @@
- 		if (stream_source == VIDEO_SOURCE_DEMUX) {
- 			/* stop and reset FIFO 1 */
- 			SAA716x_EPWR(PHI_1, FPGA_ADDR_FIFO_CTRL, 1);
-+			sti7109->tsout_stat = TSOUT_STAT_RESET;
-+			break;
- 		}
+@@ -602,22 +643,38 @@
+ 		video_stream_source_t stream_source;
+ 
+ 		stream_source = (video_stream_source_t) parg;
+-		if (stream_source == VIDEO_SOURCE_DEMUX) {
+-			/* stop and reset FIFO 1 */
+-			SAA716x_EPWR(PHI_1, FPGA_ADDR_FIFO_CTRL, 1);
+-		}
 -		else {
 -			dvb_ringbuffer_flush_spinlock_wakeup(&sti7109->tsout);
 -			/* reset FIFO 1 */
@@ -198,25 +199,43 @@ diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff_
 -			/* start FIFO 1 */
 -			SAA716x_EPWR(PHI_1, FPGA_ADDR_FIFO_CTRL, 2);
 -		}
--		break;
-+		/* fall through */
++
++		/* stop and reset FIFO 1 */
++		SAA716x_EPWR(PHI_1, FPGA_ADDR_FIFO_CTRL, 1);
++		sti7109->tsout_stat = TSOUT_STAT_RESET;
++
++		cancel_work_sync(&sti7109->fifo_work);
++		dvb_ringbuffer_flush(&sti7109->tsout);
++
++		if (stream_source == VIDEO_SOURCE_DEMUX)
++			break;
++
++		/* start FIFO 1 */
++		SAA716x_EPWR(PHI_1, FPGA_ADDR_FIFO_CTRL, 2);
++        	sti7109->tsout_stat = TSOUT_STAT_FILL;
++		wake_up(&sti7109->tsout.queue);
+ 		break;
  	}
  	case VIDEO_CLEAR_BUFFER:
  	{
 -		dvb_ringbuffer_flush_spinlock_wakeup(&sti7109->tsout);
-+		/* reset FIFO 1 */
-+		SAA716x_EPWR(PHI_1, FPGA_ADDR_FIFO_CTRL, 1);
++		/* apparently the firmware wants to see timestamps after each jump, */
++		/* so copy at least 1 stream chunk, then only clear kernel buffer,  */
++		/* don't clear fifo                                                 */
++		if (sti7109->tsout_stat == TSOUT_STAT_FILL) {
++			/* copy 1st chunk to fifo */
++			queue_work(sti7109->fifo_workq, &sti7109->fifo_work);
++			flush_work_sync(&sti7109->fifo_work);
++                }
 +		sti7109->tsout_stat = TSOUT_STAT_RESET;
 +		cancel_work_sync(&sti7109->fifo_work);
-+		/* start FIFO 1 */
-+		SAA716x_EPWR(PHI_1, FPGA_ADDR_FIFO_CTRL, 2);
 +		dvb_ringbuffer_flush(&sti7109->tsout);
 +        	sti7109->tsout_stat = TSOUT_STAT_FILL;
 +		wake_up(&sti7109->tsout.queue);
  		break;
  	}
  	case VIDEO_GET_PTS:
-@@ -689,7 +733,6 @@
+@@ -689,7 +746,6 @@
  	struct sti7109_dev *sti7109		= saa716x->priv;
  
  	dvb_ringbuffer_init(&sti7109->tsout, sti7109->iobuf, TSOUT_LEN);
@@ -224,7 +243,7 @@ diff -r 0766d1c37f7b -r 66c2426f656f linux/drivers/media/pci/saa716x/saa716x_ff_
  
  	dvb_register_device(&saa716x_adap->dvb_adapter,
  			    &sti7109->video_dev,
-@@ -778,7 +821,7 @@
+@@ -778,7 +834,7 @@
  
  	sti7109->dev = saa716x;
  
