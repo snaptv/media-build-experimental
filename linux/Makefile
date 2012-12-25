@@ -60,8 +60,8 @@ TODAY_TAR := linux-media-`date "+%Y-%m-%d"`.tar
 TODAY_TAR_MD5 := linux-media-`date "+%Y-%m-%d"`.tar.bz2.md5
 #LATEST_TAR := http://linuxtv.org/downloads/drivers/linux-media-LATEST.tar.bz2
 #LATEST_TAR_MD5 := http://linuxtv.org/downloads/drivers/linux-media-LATEST.tar.bz2.md5
-LATEST_TAR := http://linuxtv.org/downloads/drivers/linux-media-2012-11-24.tar.bz2
-LATEST_TAR_MD5 := http://linuxtv.org/downloads/drivers/linux-media-2012-11-24.tar.bz2.md5
+LATEST_TAR := http://linuxtv.org/downloads/drivers/linux-media-2012-12-24.tar.bz2
+LATEST_TAR_MD5 := http://linuxtv.org/downloads/drivers/linux-media-2012-12-24.tar.bz2.md5
 
 default:
 	make -C ..
