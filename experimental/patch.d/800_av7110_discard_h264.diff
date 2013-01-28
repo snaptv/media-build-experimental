@@ -1,6 +1,6 @@
 --- linux/drivers/media/pci/ttpci/av7110_ipack.c.old	2012-08-14 05:45:22.000000000 +0200
-+++ linux/drivers/media/pci/ttpci/av7110_ipack.c	2013-01-27 14:41:24.114810675 +0100
-@@ -241,9 +241,18 @@ int av7110_ipack_instant_repack (const u
++++ linux/drivers/media/pci/ttpci/av7110_ipack.c	2013-01-28 08:08:04.836525839 +0100
+@@ -241,9 +241,19 @@ int av7110_ipack_instant_repack (const u
  
  		case 8:
  			if (!p->done && p->mpeg == 2) {
@@ -10,7 +10,8 @@
  				p->found++;
 +				/* discard non-MPEG-2 video, i.e. H264 */
 +				i = p->found + p->hlength;
-+				if (count > i + 2 && VIDEO_STREAM_S <= p->cid && p->cid <= VIDEO_STREAM_E &&
++				if (count > i + 2 && p->plength == 0 &&
++				    VIDEO_STREAM_S <= p->cid && p->cid <= VIDEO_STREAM_E &&
 +				    !(buf[i] == 0x00 && buf[i+1] == 0x00 && buf[i+2] == 0x01)) {
 +					/* not MPEG-2 */
 +					av7110_ipack_reset(p);
