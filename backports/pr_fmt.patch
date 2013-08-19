@@ -58,18 +58,6 @@ index 0bb4430..1ea4292 100644
  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
  
  #include <linux/module.h>
-diff --git a/drivers/media/dvb-frontends/drxk_hard.c b/drivers/media/dvb-frontends/drxk_hard.c
-index 082014d..3b2d919 100644
---- a/drivers/media/dvb-frontends/drxk_hard.c
-+++ b/drivers/media/dvb-frontends/drxk_hard.c
-@@ -21,6 +21,7 @@
-  * Or, point your browser to http://www.gnu.org/copyleft/gpl.html
-  */
- 
-+#undef pr_fmt
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include <linux/kernel.h>
 diff --git a/drivers/media/dvb-frontends/nxt200x.c b/drivers/media/dvb-frontends/nxt200x.c
 index 8e28894..24e76f6 100644
 --- a/drivers/media/dvb-frontends/nxt200x.c
