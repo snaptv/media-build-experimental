@@ -11,19 +11,6 @@ index 401ef64..fddb485 100644
  {
  	struct dvb_device *dvbdev = dev_get_drvdata(dev);
  
-diff --git a/drivers/media/pci/ddbridge/ddbridge-core.c b/drivers/media/pci/ddbridge/ddbridge-core.c
-index 36e3452..624833d 100644
---- a/drivers/media/pci/ddbridge/ddbridge-core.c
-+++ b/drivers/media/pci/ddbridge/ddbridge-core.c
-@@ -1481,7 +1481,7 @@ static const struct file_operations ddb_fops = {
- 	.open           = ddb_open,
- };
- 
--static char *ddb_devnode(struct device *device, umode_t *mode)
-+static char *ddb_devnode(struct device *device, mode_t *mode)
- {
- 	struct ddb *dev = dev_get_drvdata(device);
- 
 diff --git a/drivers/media/rc/rc-main.c b/drivers/media/rc/rc-main.c
 index 1cf382a..7b71836 100644
 --- a/drivers/media/rc/rc-main.c
