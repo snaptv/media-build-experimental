@@ -336,7 +336,7 @@ $(obj)/.config: $(obj)/.version
 		./scripts/make_kconfig.pl $(OUTDIR) $(SRCDIR); \
 		../experimental/update_kconfig.pl; fi
 
-$(obj)/Kconfig: $(obj)/.version
+$(obj)/Kconfig: $(obj)/.version $(obj)/.config
 	@$(MAKE) -C ../linux apply_patches
 	./scripts/make_kconfig.pl $(OUTDIR) $(SRCDIR)
 	../experimental/update_kconfig.pl

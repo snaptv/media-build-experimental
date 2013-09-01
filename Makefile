@@ -1,3 +1,5 @@
+.NOTPARALLEL:
+
 BUILD_DIR := $(shell pwd)/v4l
 TMP ?= /tmp
 

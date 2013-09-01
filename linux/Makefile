@@ -2,6 +2,8 @@
 # Files that need to be bundled with the building system
 #
 
+.NOTPARALLEL:
+
 -include ../v4l/.version
 
 MAINDIRS += drivers firmware include sound
