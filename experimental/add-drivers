@@ -37,7 +37,9 @@ patch -d.. -p0 < stv0367dd-tda18212dd.frontend-makefile.diff
 cp -r drxk/* ../linux/drivers/media/dvb-frontends/
 
 # Add TT DVB S2-6400
-fetch_hg_repo "http://powarman.dyndns.org/hg/v4l-dvb-saa716x" "v4l-dvb-saa716x" || fetch_hg_repo "http://linuxtv.org/hg/~endriss/mirror-saa716x" "v4l-dvb-saa716x"
+fetch_hg_repo "https://bitbucket.org/powARman/v4l-dvb-saa716x" "v4l-dvb-saa716x" ||
+ fetch_hg_repo "http://powarman.dyndns.org/hg/v4l-dvb-saa716x" "v4l-dvb-saa716x" ||
+ fetch_hg_repo "http://linuxtv.org/hg/~endriss/mirror-saa716x" "v4l-dvb-saa716x"
 rm -Rf ../linux/drivers/media/pci/saa716x
 cp -r v4l-dvb-saa716x/linux/drivers/media/common/saa716x  ../linux/drivers/media/pci/
 patch -d.. -p0 < saa716x.pci-kconfig.diff
