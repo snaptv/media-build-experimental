@@ -2,13 +2,13 @@
 
 fetch_hg_repo()
 {
+  {
     if [ -d $2 ] ; then
         (cd $2; hg pull -u $1)
     else
         hg clone $1 $2
     fi
-
-    hg tip -R $2 --template "$2: {node} {desc|firstline}\n" >> ../linux/git_log
+  } && hg tip -R $2 --template "$2: {node} {desc|firstline}\n" >> ../linux/git_log
 }
 
 apply_patch()
