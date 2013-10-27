@@ -154,6 +154,7 @@ endif
 PWD		:= $(shell pwd)
 DEST		:= /lib/modules/$(KERNELRELEASE)/v4l2
 KDIR26		:= /lib/modules/$(KERNELRELEASE)/kernel/drivers/media
+INSTDIR 	:= $(DESTDIR)/lib/modules/$(KERNELRELEASE)/updates/media
 
 #################################################
 # Compiler fixup rules
@@ -200,9 +201,18 @@ all:: default
 #################################################
 # installation invocation rules
 
-modules_install install:: media-install firmware_install
+modules_install install:: rminstall firmware_install
+	install -d -v $(INSTDIR)
+	@for i in *.ko; do				\
+		echo "install $$i -> $(INSTDIR)/";	\
+		install -p -m 644 $$i $(INSTDIR);	\
+	done;
+	strip --strip-debug $(INSTDIR)/*.ko
+	/sbin/depmod -a $(KERNELRELEASE) $(if $(DESTDIR),-b $(DESTDIR))
 
-remove rminstall:: media-rminstall
+remove rminstall::
+	@rm -Rfv $(INSTDIR)
+	/sbin/depmod -a $(KERNELRELEASE) $(if $(DESTDIR),-b $(DESTDIR))
 
 firmware_install::
 	make -C firmware install
