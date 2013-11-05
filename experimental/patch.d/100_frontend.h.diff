@@ -1,0 +1,10 @@
+--- linux/include/uapi/linux/dvb/frontend.h.org	2013-01-24 05:46:02.000000000 +0100
++++ linux/include/uapi/linux/dvb/frontend.h	2013-09-05 21:26:47.000000000 +0200
+@@ -410,6 +410,7 @@ typedef enum fe_delivery_system {
+ 	SYS_DVBT2,
+ 	SYS_TURBO,
+ 	SYS_DVBC_ANNEX_C,
++	SYS_DVBC2,
+ } fe_delivery_system_t;
+ 
+ /* backward compatibility */
