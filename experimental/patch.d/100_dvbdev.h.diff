@@ -1,0 +1,13 @@
+--- linux/drivers/media/dvb-core/dvbdev.h.org	2012-08-14 05:45:22.000000000 +0200
++++ linux/drivers/media/dvb-core/dvbdev.h	2012-12-09 10:24:22.000000000 +0100
+@@ -47,6 +47,10 @@
+ #define DVB_DEVICE_CA         6
+ #define DVB_DEVICE_NET        7
+ #define DVB_DEVICE_OSD        8
++#define DVB_DEVICE_CI         9
++#define DVB_DEVICE_MOD       10
++#define DVB_DEVICE_NS        11
++#define DVB_DEVICE_NSD       12
+ 
+ #define DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nr) \
+ 	static short adapter_nr[] = \
