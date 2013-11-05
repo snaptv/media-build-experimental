@@ -26,15 +26,20 @@ hg tip --template "experimental: {node} {desc|firstline}\n" >> ../linux/git_log
 set -ev
 
 # Add ngene & octopus
-fetch_hg_repo "http://linuxtv.org/hg/~endriss/ngene-octopus-test" "ngene-octopus-test"
-rm -Rf ../linux/drivers/media/pci/{ddbridge,ngene} ../linux/drivers/staging/media/cxd2099
-cp -r ngene-octopus-test/linux/drivers/media/dvb/{ddbridge,ngene} ../linux/drivers/media/pci/
-cp -r ngene-octopus-test/linux/drivers/staging/cxd2099 ../linux/drivers/staging/media/
-cp ngene-octopus-test/linux/drivers/media/dvb/frontends/tda18212dd* ../linux/drivers/media/dvb-frontends/
-cp ngene-octopus-test/linux/drivers/media/dvb/frontends/stv0367dd*  ../linux/drivers/media/dvb-frontends/
-patch -d.. -p0 < stv0367dd-tda18212dd.frontend-kconfig.diff
-patch -d.. -p0 < stv0367dd-tda18212dd.frontend-makefile.diff
-cp -r drxk/* ../linux/drivers/media/dvb-frontends/
+rm -Rf ../linux/drivers/media/pci/{ddbridge,ngene} ../linux/drivers/staging/media/cxd2099/cxd2099*
+cp -r dddvb/ddbridge ../linux/drivers/media/pci/
+cp    oe/ddbridge/*  ../linux/drivers/media/pci/ddbridge/
+cp -r oe/ngene       ../linux/drivers/media/pci/
+# frontends
+cp dddvb/frontends/cxd2099*    ../linux/drivers/staging/media/cxd2099/
+cp dddvb/frontends/tda18212dd* ../linux/drivers/media/dvb-frontends/
+cp dddvb/frontends/stv0367dd*  ../linux/drivers/media/dvb-frontends/
+cp oe/drxk/*                   ../linux/drivers/media/dvb-frontends/
+cp dddvb/frontends/cxd2843*    ../linux/drivers/media/dvb-frontends/
+# dvb-core extensions
+cp dddvb/include/linux/dvb/mod.h   ../linux/include/uapi/linux/dvb/
+cp dddvb/include/linux/dvb/ns.h    ../linux/include/uapi/linux/dvb/
+cp dddvb/dvb-core/dvb_netstream.*  ../linux/drivers/media/dvb-core/
 
 # Add TT DVB S2-6400
 fetch_hg_repo "https://bitbucket.org/powARman/v4l-dvb-saa716x" "v4l-dvb-saa716x" ||
