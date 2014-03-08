@@ -1,24 +1,22 @@
---- linux/drivers/media/usb/em28xx/em28xx-dvb.c.org	2012-11-19 05:33:42.000000000 +0100
-+++ linux/drivers/media/usb/em28xx/em28xx-dvb.c	2012-11-19 05:38:09.000000000 +0100
-@@ -317,8 +317,6 @@ static struct drxk_config terratec_h5_dr
+--- linux/drivers/media/usb/em28xx/em28xx-dvb.c.org	2014-01-15 05:45:58.000000000 +0100
++++ linux/drivers/media/usb/em28xx/em28xx-dvb.c	2014-02-05 00:38:49.681120543 +0100
+@@ -374,7 +374,6 @@ static struct drxk_config terratec_h5_dr
  	.single_master = 1,
  	.no_i2c_bridge = 1,
  	.microcode_name = "dvb-usb-terratec-h5-drxk.fw",
 -	.qam_demod_parameter_count = 2,
--	.load_firmware_sync = true,
  };
  
  static struct drxk_config hauppauge_930c_drxk = {
-@@ -327,8 +325,6 @@ static struct drxk_config hauppauge_930c
+@@ -383,7 +382,6 @@ static struct drxk_config hauppauge_930c
  	.no_i2c_bridge = 1,
  	.microcode_name = "dvb-usb-hauppauge-hvr930c-drxk.fw",
  	.chunk_size = 56,
 -	.qam_demod_parameter_count = 2,
--	.load_firmware_sync = true,
  };
  
  static struct drxk_config terratec_htc_stick_drxk = {
-@@ -337,30 +333,25 @@ static struct drxk_config terratec_htc_s
+@@ -392,7 +390,6 @@ static struct drxk_config terratec_htc_s
  	.no_i2c_bridge = 1,
  	.microcode_name = "dvb-usb-terratec-htc-stick-drxk.fw",
  	.chunk_size = 54,
@@ -26,15 +24,11 @@
  	/* Required for the antenna_gpio to disable LNA. */
  	.antenna_dvbt = true,
  	/* The windows driver uses the same. This will disable LNA. */
- 	.antenna_gpio = 0x6,
--	.load_firmware_sync = true,
- };
- 
- static struct drxk_config maxmedia_ub425_tc_drxk = {
- 	.adr = 0x29,
- 	.single_master = 1,
+@@ -405,14 +402,12 @@ static struct drxk_config maxmedia_ub425
  	.no_i2c_bridge = 1,
--	.load_firmware_sync = true,
+ 	.microcode_name = "dvb-demod-drxk-01.fw",
+ 	.chunk_size = 62,
+-	.qam_demod_parameter_count = 2,
  };
  
  static struct drxk_config pctv_520e_drxk = {
@@ -45,7 +39,3 @@
  	.chunk_size = 58,
  	.antenna_dvbt = true, /* disable LNA */
  	.antenna_gpio = (1 << 2), /* disable LNA */
--	.load_firmware_sync = true,
- };
- 
- static int drxk_gate_ctrl(struct dvb_frontend *fe, int enable)
