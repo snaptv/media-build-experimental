@@ -1,5 +1,4 @@
----
-diff --git a/drivers/media/common/tuners/tuner-xc2028.c b/drivers/media/common/tuners/tuner-xc2028.c
+diff --git a/drivers/media/tuners/tuner-xc2028.c b/drivers/media/tuners/tuner-xc2028.c
 index f88f948..8591799 100644
 --- a/drivers/media/tuners/tuner-xc2028.c
 +++ b/drivers/media/tuners/tuner-xc2028.c
