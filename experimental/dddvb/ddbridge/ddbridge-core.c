@@ -384,7 +384,7 @@ static void ddb_input_stop(struct ddb_input *input)
 		input->dma->running = 0;
 		spin_unlock_irq(&input->dma->lock);
 	}
-	pr_info("input_stop %d.%d\n", dev->nr, input->nr);
+	/* pr_info("input_stop %d.%d\n", dev->nr, input->nr); */
 }
 
 static void ddb_input_start(struct ddb_input *input)
@@ -417,7 +417,7 @@ static void ddb_input_start(struct ddb_input *input)
 		input->dma->running = 1;
 		spin_unlock_irq(&input->dma->lock);
 	}
-	pr_info("input_start %d.%d\n", dev->nr, input->nr);
+	/* pr_info("input_start %d.%d\n", dev->nr, input->nr); */
 }
 
 
