@@ -38,7 +38,7 @@ add v3.9_pfn_warning.patch
 add v3.8_config_of.patch
 
 [3.6.255]
-add v3.6_pci_error_handlers.patch
+### never add v3.6_pci_error_handlers.patch
 add v3.6_i2c_add_mux_adapter.patch
 
 [3.2.255]
