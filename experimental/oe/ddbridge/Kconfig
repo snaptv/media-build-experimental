@@ -18,6 +18,6 @@ config DVB_DDBRIDGE
 	  - DuoFlex S2
 	  - DuoFlex CT
 	  - cineS2(v6.x)
-	  - cineCT(v6.x)
+	  - cineCT(v6.x, v7)
 
 	  Say Y if you own such a card and want to use it.
