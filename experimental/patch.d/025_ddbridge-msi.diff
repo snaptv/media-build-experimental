@@ -1,0 +1,33 @@
+--- linux/drivers/media/pci/ddbridge/ddbridge.c.old	2014-04-14 00:00:00.152525768 +0200
++++ linux/drivers/media/pci/ddbridge/ddbridge.c	2014-04-13 23:59:25.656526207 +0200
+@@ -25,7 +25,7 @@
+ /*#define DDB_ALT_DMA*/
+ #define DDB_USE_WORK
+ /*#define DDB_TEST_THREADED*/
+-#undef CONFIG_PCI_MSI
++/* #undef CONFIG_PCI_MSI */
+ 
+ #include "ddbridge.h"
+ #include "ddbridge-regs.h"
+@@ -49,6 +49,12 @@ MODULE_PARM_DESC(adapter_alloc,
+ 		 "0-one adapter per io, 1-one per tab with io, "
+ 		 "2-one per tab, 3-one for all");
+ 
++#ifdef CONFIG_PCI_MSI
++static int msi = 1;
++module_param(msi, int, 0444);
++MODULE_PARM_DESC(msi, " Control MSI interrupts: 0-disable, 1-enable (default)");
++#endif
++
+ #include "ddbridge-core.c"
+ 
+ /****************************************************************************/
+@@ -150,7 +156,7 @@ static int __devinit ddb_probe(struct pc
+ 	ddbwritel(dev, 0x00000000, MSI7_ENABLE);
+ 
+ #ifdef CONFIG_PCI_MSI
+-	if (pci_msi_enabled()) {
++	if (msi && pci_msi_enabled()) {
+ 		stat = pci_enable_msi_block(dev->pdev, 2);
+ 		if (stat == 0) {
+ 			dev->msi = 1;
