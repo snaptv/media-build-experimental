@@ -45,6 +45,16 @@
 #include "drxk.h"
 #include "tda18212dd.h"
 #include "stv0367dd.h"
+#include "cxd2843.h"
+
+
+enum DEMOD_TYPE {
+	DMD_NONE = 0,
+	DMD_STV0900,
+	DMD_DRXK,
+	DMD_STV0367,
+	DMD_CXD28xx,
+};
 
 
 /****************************************************************************/
@@ -216,10 +226,12 @@ static int tuner_attach_tda18212dd(struct ngene_channel *chan)
 {
 	struct i2c_adapter *i2c;
 	struct dvb_frontend *fe;
+	u8 addr = (chan->number & 1) ? 0x63 : 0x60;
 
+	if (chan->demod_type == DMD_CXD28xx && chan->number < 2)
+		addr ^= 0x04;
 	i2c = &chan->dev->channel[0].i2c_adapter;
-	fe = dvb_attach(tda18212dd_attach, chan->fe, i2c,
-			(chan->number & 1) ? 0x63 : 0x60);
+	fe = dvb_attach(tda18212dd_attach, chan->fe, i2c, addr);
 	if (!fe) {
 		printk(KERN_ERR "No TDA18212 found!\n");
 		return -ENODEV;
@@ -229,12 +241,22 @@ static int tuner_attach_tda18212dd(struct ngene_channel *chan)
 
 static int tuner_attach_probe(struct ngene_channel *chan)
 {
-	if (chan->demod_type == 0)
+	switch(chan->demod_type)
+	{
+	case DMD_STV0900:
 		return tuner_attach_stv6110(chan);
-	if (chan->demod_type == 1)
+
+	case DMD_DRXK:
 		return tuner_attach_tda18271(chan);
-	if (chan->demod_type == 2)
+
+	case DMD_STV0367:
+	case DMD_CXD28xx:
 		return tuner_attach_tda18212dd(chan);
+
+	default:
+		pr_err("Unknown demod %x\n", chan->demod_type);
+		break;
+	}
 	return -EINVAL;
 }
 
@@ -292,6 +314,26 @@ static int i2c_read(struct i2c_adapter *adapter, u8 adr, u8 *val)
 	return (i2c_transfer(adapter, msgs, 1) == 1) ? 0 : -1;
 }
 
+static int i2c_read_regs(struct i2c_adapter *adapter,
+			 u8 adr, u8 reg, u8 *val, u8 len)
+{
+	struct i2c_msg msgs[2] = {{.addr = adr,  .flags = 0,
+				   .buf  = &reg, .len   = 1 },
+				  {.addr = adr,  .flags = I2C_M_RD,
+				   .buf  = val,  .len   = len } };
+	return (i2c_transfer(adapter, msgs, 2) == 2) ? 0 : -1;
+}
+
+static int i2c_read_reg(struct i2c_adapter *adapter, u8 adr,
+			u8 reg, u8 *val)
+{
+	struct i2c_msg msgs[2] = {{.addr = adr, .flags = 0,
+				   .buf  = &reg, .len  = 1},
+				  {.addr = adr, .flags = I2C_M_RD,
+				   .buf  = val, .len   = 1} };
+	return (i2c_transfer(adapter, msgs, 2) == 2) ? 0 : -1;
+}
+
 static int i2c_read_reg16(struct i2c_adapter *adapter, u8 adr,
 			  u16 reg, u8 *val)
 {
@@ -301,6 +343,15 @@ static int i2c_read_reg16(struct i2c_adapter *adapter, u8 adr,
 				  {.addr = adr, .flags = I2C_M_RD,
 				   .buf  = val, .len   = 1} };
 	return (i2c_transfer(adapter, msgs, 2) == 2) ? 0 : -1;
+}
+
+static int i2c_write_reg(struct i2c_adapter *adapter, u8 adr,
+			 u8 reg, u8 val)
+{
+	u8 msg[2] = {reg, val};
+	struct i2c_msg msgs[1] = {{.addr = adr,  .flags = 0,
+                                   .buf  = msg,  .len   = 2 } };
+        return (i2c_transfer(adapter, msgs, 1) == 1) ? 0 : -1;
 }
 
 static int port_has_stv0900(struct i2c_adapter *i2c, int port)
@@ -374,6 +425,109 @@ static int demod_attach_stv0367dd(struct ngene_channel *chan,
 	return 0;
 }
 
+static int port_has_xo2(struct i2c_adapter *i2c, int port, u8 *id)
+{
+	u8 addr = (port < 2) ? 0x14 : 0x10;
+	u8 val;
+	u8 probe[1] = { 0x00 }, data[4];
+	struct i2c_msg msgs[2] = {{ .addr = addr,  .flags = 0,
+				    .buf  = probe, .len   = 1 },
+				  { .addr = addr,  .flags = I2C_M_RD,
+				    .buf  = data,  .len   = 4 } };
+#if 0
+	u8 cfg[] = { 0x79, 0x00, 0x00 };
+	struct i2c_msg cmsg = { .addr = 0x44, .flags = 0,
+				.buf  = cfg,  .len   = 3 };
+	if (port == 0)
+		i2c_transfer(i2c, &cmsg, 1);
+	pr_info("chan %d addr %x\n", port, addr);
+	msleep(1000);
+#endif
+	val = i2c_transfer(i2c, msgs, 2);
+	if (val != 2)
+		return 0;
+
+	if (data[0] != 'D' || data[1] != 'F')
+		return 0;
+
+	*id = data[2];
+	return 1;
+}
+
+static int init_xo2(struct i2c_adapter *i2c, int port)
+{
+	u8 addr = (port < 2) ? 0x14 : 0x10;
+	u8 val, data[2];
+	int res;
+
+	if (port & 1)
+		return 0;
+
+	res = i2c_read_regs(i2c, addr, 0x04, data, 2);
+	if (res < 0)
+		return res;
+
+	if (data[0] != 0x01)  {
+		pr_info("Invalid XO2\n");
+		return -1;
+	}
+
+	i2c_read_reg(i2c, addr, 0x08, &val);
+	if (val != 0) {
+		i2c_write_reg(i2c, addr, 0x08, 0x00);
+		msleep(100);
+	}
+	/* Enable tuner power, disable pll, reset demods */
+	i2c_write_reg(i2c, addr, 0x08, 0x04);
+	usleep_range(2000, 3000);
+	/* Release demod resets */
+	i2c_write_reg(i2c, addr, 0x08, 0x07);
+	usleep_range(2000, 3000);
+	/* Start XO2 PLL */
+	i2c_write_reg(i2c, addr, 0x08, 0x87);
+
+	return 0;
+}
+
+#define DDB_TUNER_XO2		16
+#define DDB_TUNER_DVBS_STV0910	16
+#define DDB_TUNER_DVBCT2_SONY	17
+#define DDB_TUNER_ISDBT_SONY	18
+#define DDB_TUNER_DVBC2T2_SONY	19
+#define DDB_TUNER_ATSC_ST	20
+#define DDB_TUNER_DVBC2T2_ST	21
+
+static char *xo2names[] = {
+	"DUAL DVB-S2",
+	"DUAL DVB-C/T/T2",
+	"DUAL DVB-ISDBT",
+	"DUAL DVB-C/C2/T/T2",
+	"DUAL ATSC",
+	"DUAL DVB-C/C2/T/T2",
+	"", ""
+};
+
+struct cxd2843_cfg cxd2843[] = {
+	{ .adr = 0x68, },
+	{ .adr = 0x69, },
+	{ .adr = 0x6c, },
+	{ .adr = 0x6d, },
+};
+
+static int demod_attach_cxd2843(struct ngene_channel *chan,
+				struct i2c_adapter *i2c)
+{
+	chan->fe = dvb_attach(cxd2843_attach, i2c, cxd2843+chan->number);
+	if (!chan->fe) {
+		pr_err("No cxd2837/38/43 found!\n");
+		return -ENODEV;
+	}
+	chan->fe->sec_priv = chan;
+	chan->gate_ctrl = chan->fe->ops.i2c_gate_ctrl;
+	chan->fe->ops.i2c_gate_ctrl = locked_gate_ctrl;
+	return 0;
+}
+
 static int cineS2_probe(struct ngene_channel *chan)
 {
 	struct i2c_adapter *i2c;
@@ -381,6 +535,7 @@ static int cineS2_probe(struct ngene_channel *chan)
 	u8 buf[3];
 	struct i2c_msg i2c_msg = { .flags = 0, .buf = buf };
 	int rc;
+	u8 id;
 
 	/* tuner 1+2: i2c adapter #0, tuner 3+4: i2c adapter #1 */
 	if (chan->number < 2)
@@ -388,8 +543,33 @@ static int cineS2_probe(struct ngene_channel *chan)
 	else
 		i2c = &chan->dev->channel[1].i2c_adapter;
 
-	if (port_has_stv0900(i2c, chan->number)) {
-		chan->demod_type = 0;
+	if (port_has_xo2(i2c, chan->number, &id)) {
+		id >>= 2;
+		if (id > 5) {
+			pr_info("Channel %d: Unknown XO2 DuoFlex %u\n",
+				chan->number, id);
+			return -ENODEV;
+		}
+		init_xo2(i2c, chan->number);
+		switch(DDB_TUNER_XO2 + id)
+		{
+		case DDB_TUNER_DVBCT2_SONY:
+		case DDB_TUNER_ISDBT_SONY:
+		case DDB_TUNER_DVBC2T2_SONY:
+			chan->demod_type = DMD_CXD28xx;
+			pr_info("Channel %d: %s\n", chan->number, xo2names[id]);
+			demod_attach_cxd2843(chan, i2c);		
+			break;
+		default:
+			pr_info("Channel %d: %s not supported yet\n",
+				chan->number, xo2names[id]);
+			return -ENODEV;
+		}
+
+	} else if (chan->dev->channel[0].demod_type != DMD_CXD28xx &&
+		   port_has_stv0900(i2c, chan->number)) {
+		chan->demod_type = DMD_STV0900;
+		pr_info("Channel %d: STV0900\n", chan->number);
 		fe_conf = chan->dev->card_info->fe_config[chan->number];
 		/* demod found, attach it */
 		rc = demod_attach_stv0900(chan);
@@ -417,12 +597,17 @@ static int cineS2_probe(struct ngene_channel *chan)
 			printk(KERN_ERR DEVICE_NAME ": could not setup DPNx\n");
 			return -EIO;
 		}
+
 	} else if (port_has_drxk(i2c, chan->number^2)) {
-		chan->demod_type = 1;
+		chan->demod_type = DMD_DRXK;
+		pr_info("Channel %d: DRXK\n", chan->number);
 		demod_attach_drxk(chan, i2c);
+
 	} else if (port_has_stv0367(i2c, chan->number)) {
-		chan->demod_type = 2;
+		chan->demod_type = DMD_STV0367;
+		pr_info("Channel %d: STV0367\n", chan->number);
 		demod_attach_stv0367dd(chan, i2c);
+
 	} else {
 		printk(KERN_ERR "No demod found on chan %d\n", chan->number);
 		return -ENODEV;
