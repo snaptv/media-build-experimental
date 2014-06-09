@@ -57,7 +57,7 @@ TARFILES += firmware/ihex2fw.c
 TARFILES += firmware/vicam/firmware.H16
 TARFILES += firmware/ttusb-budget/dspbootcode.bin.ihex
 
-DATE := `git log -n1 '--pretty=format:%h %ai' |perl -ne 'print "$$2-$$1" if (m/([\da-f]+)\s+(\S+)/)'`
+DATE := `git --git-dir $(DIR)/.git log -n1 '--pretty=format:%h %ai' |perl -ne 'print "$$2-$$1" if (m/([\da-f]+)\s+(\S+)/)'`
 TODAY_TAR := linux-media-${DATE}.tar
 TODAY_TAR_MD5 := ${TODAY_TAR}.bz2.md5
 TODAY_TAR_MD5 := linux-media-`date "+%Y-%m-%d"`.tar.bz2.md5
