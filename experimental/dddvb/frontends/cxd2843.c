@@ -332,7 +332,7 @@ static int read_tps(struct cxd_state *state, u8 *tps)
 		return 0;
 
 	freeze_regst(state);
-	readregst(state, 0x10, 0x2f, tps, 7);
+	readregst_unlocked(state, 0x10, 0x2f, tps, 7);
 	unfreeze_regst(state);
 	return 0;
 }
@@ -1170,7 +1170,8 @@ static void init(struct cxd_state *state)
 	writeregx(state, 0xFF, 0x02, 0x00);
 	usleep_range(4000, 5000);
 	writeregx(state, 0x00, 0x15, 0x01);
-	writeregx(state, 0x00, 0x17, 0x01);
+	if (state->type != CXD2838)
+		writeregx(state, 0x00, 0x17, 0x01);
 	usleep_range(4000, 5000);
 
 	writeregx(state, 0x00, 0x10, 0x01);
@@ -1819,7 +1820,7 @@ static int get_fe_c(struct cxd_state *state)
 	u8 qam;
 
 	freeze_regst(state);
-	readregst(state, 0x40, 0x19, &qam, 1);
+	readregst_unlocked(state, 0x40, 0x19, &qam, 1);
 	unfreeze_regst(state);
 	p->modulation = qam & 0x07;
 	return 0;
