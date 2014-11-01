@@ -39,6 +39,7 @@ cp dddvb/frontends/cxd2843*    ../linux/drivers/media/dvb-frontends/
 cp dddvb/frontends/lnbh25*     ../linux/drivers/media/dvb-frontends/
 cp dddvb/frontends/stv6111*    ../linux/drivers/media/dvb-frontends/
 cp dddvb/frontends/stv0910*    ../linux/drivers/media/dvb-frontends/
+cp dddvb/frontends/mxl5xx*     ../linux/drivers/media/dvb-frontends/
 # dvb-core extensions
 cp dddvb/include/linux/dvb/mod.h   ../linux/include/uapi/linux/dvb/
 cp dddvb/include/linux/dvb/ns.h    ../linux/include/uapi/linux/dvb/

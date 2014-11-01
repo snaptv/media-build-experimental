@@ -1,0 +1,27 @@
+--- linux/drivers/media/pci/ddbridge/ddbridge-core.c.orig	2014-11-01 15:31:39.590993624 +0100
++++ linux/drivers/media/pci/ddbridge/ddbridge-core.c	2014-11-01 15:36:15.634999721 +0100
+@@ -1412,8 +1412,10 @@ static int fe_attach_mxl5xx(struct ddb_i
+ 	dvb->fe->ops.set_tone = dd_set_tone;
+ 	dvb->fe->ops.diseqc_send_master_cmd = dd_send_master_cmd;
+ 	dvb->fe->sec_priv = input;
++#if 0 // OE
+ 	dvb->set_input = dvb->fe->ops.set_input;
+ 	dvb->fe->ops.set_input = dd_set_input;
++#endif
+ 	dvb->input = tuner;
+ 	return 0;
+ }
+@@ -1684,7 +1686,13 @@ static int dvb_input_attach(struct ddb_i
+ 	dvb->fe = dvb->fe2 = 0;
+ 	switch (port->type) {
+ 	case DDB_TUNER_MXL5XX:
++#if 0 // OE
+ 		fe_attach_mxl5xx(input);
++#else
++		pr_err("MXL5XX not supported yet!\n");
++		(void)fe_attach_mxl5xx;
++		return -ENODEV;
++#endif
+ 		break;
+ 	case DDB_TUNER_DVBS_ST:
+ 		if (demod_attach_stv0900(input, 0) < 0)
