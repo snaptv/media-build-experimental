@@ -1,0 +1,26 @@
+--- linux/drivers/media/pci/ddbridge/ddbridge.c.orig	2014-11-01 15:42:06.515007472 +0100
++++ linux/drivers/media/pci/ddbridge/ddbridge.c	2014-11-01 16:00:33.471031923 +0100
+@@ -146,6 +146,15 @@ static int __devinit ddb_probe(struct pc
+ 
+ #ifdef CONFIG_PCI_MSI
+ 	if (msi && pci_msi_enabled()) {
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0)) // OE
++		stat = pci_enable_msi_range(dev->pdev, 1, 2);
++		if (stat >= 1) {
++			dev->msi = stat;
++			pr_info(": Using %d MSI interrupts\n", dev->msi);
++			irq_flag = 0;
++		} else
++			pr_info(": MSI not available.\n");
++#else
+ 		stat = pci_enable_msi_block(dev->pdev, 2);
+ 		if (stat == 0) {
+ 			dev->msi = 1;
+@@ -159,6 +168,7 @@ static int __devinit ddb_probe(struct pc
+ 			irq_flag = 0;
+ 			dev->msi++;
+ 		}
++#endif
+ 	}
+ 	if (dev->msi == 2) {
+ 		stat = request_irq(dev->pdev->irq, irq_handler0,
