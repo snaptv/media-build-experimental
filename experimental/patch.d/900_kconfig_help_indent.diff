@@ -1,0 +1,14 @@
+diff -r 2292fdacee67 v4l/scripts/make_kconfig.pl
+--- a/v4l/scripts/make_kconfig.pl	Sat Nov 01 21:20:44 2014 +0100
++++ b/v4l/scripts/make_kconfig.pl	Sun Nov 02 14:10:24 2014 +0100
+@@ -253,8 +253,8 @@
+ # Text to be added to disabled options
+ my $disabled_msg = <<'EOF';
+ 	---help---
+-	  WARNING! This driver needs at least kernel %s!  It may not
+-	  compile or work correctly on your kernel, which is too old.
++	 WARNING! This driver needs at least kernel %s!  It may not
++	 compile or work correctly on your kernel, which is too old.
+ 
+ EOF
+ 
