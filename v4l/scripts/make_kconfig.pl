@@ -253,8 +253,8 @@ sub checkdeps()
 # Text to be added to disabled options
 my $disabled_msg = <<'EOF';
 	---help---
-	  WARNING! This driver needs at least kernel %s!  It may not
-	  compile or work correctly on your kernel, which is too old.
+	 WARNING! This driver needs at least kernel %s!  It may not
+	 compile or work correctly on your kernel, which is too old.
 
 EOF
 
