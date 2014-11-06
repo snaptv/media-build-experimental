@@ -1,10 +1,10 @@
---- linux/drivers/media/pci/Makefile.orig	2014-11-01 10:48:45.150618682 +0100
-+++ linux/drivers/media/pci/Makefile	2014-11-01 10:57:16.146629969 +0100
+--- linux/drivers/media/pci/Makefile.orig	2014-11-06 22:39:16.154804351 +0100
++++ linux/drivers/media/pci/Makefile	2014-11-06 22:42:14.562808291 +0100
 @@ -11,6 +11,7 @@ obj-y        +=	ttpci/		\
  		mantis/		\
  		ngene/		\
  		ddbridge/	\
 +		saa716x/	\
- 		saa7146/
+ 		saa7146/	\
+ 		smipcie/
  
- obj-$(CONFIG_VIDEO_IVTV) += ivtv/
