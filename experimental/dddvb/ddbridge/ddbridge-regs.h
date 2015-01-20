@@ -105,6 +105,9 @@
 #define INTMASK_TSOUTPUT4   (0x00080000)
 
 
+
+/* Modulator registers */
+
 /*  Clock Generator ( Sil598 @ 0xAA I2c ) */
 #define CLOCKGEN_BASE       (0x80)
 #define CLOCKGEN_CONTROL    (CLOCKGEN_BASE + 0x00)
@@ -141,10 +144,10 @@
 #define I2C_TASKADDRESS (0x0C)     /* High read, low write */
 #define I2C_MONITOR     (0x1C)
 
-#define I2C_BASE_N(i)   (I2C_BASE + (i) * 0x20)
 
 #define I2C_TASKMEM_BASE    (0x1000)    /* Byte offset */
 #define I2C_TASKMEM_SIZE    (0x0800)
+#define I2C_BUF_SIZE    (I2C_TASKMEM_SIZE / 8)
 
 #define I2C_SPEED_666   (0x02010202)
 #define I2C_SPEED_400   (0x04030404)
