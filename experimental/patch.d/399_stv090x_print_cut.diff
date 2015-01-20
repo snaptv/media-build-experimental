@@ -1,0 +1,13 @@
+diff --git a/drivers/media/dvb-frontends/stv090x.c b/drivers/media/dvb-frontends/stv090x.c
+index ae188a8..0ec73b6 100644
+--- a/drivers/media/dvb-frontends/stv090x.c
++++ b/drivers/media/dvb-frontends/stv090x.c
+@@ -4996,7 +4996,7 @@ struct dvb_frontend *stv090x_attach(const struct stv090x_config *config,
+ 	if (config->diseqc_envelope_mode)
+ 		stv090x_send_diseqc_burst(&state->frontend, SEC_MINI_A);
+ 
+-	dprintk(FE_ERROR, 1, "Attaching %s demodulator(%d) Cut=0x%02x",
++	printk(KERN_INFO "Attaching %s demodulator(%d) Cut=0x%02x",
+ 	       state->device == STV0900 ? "STV0900" : "STV0903",
+ 	       demod,
+ 	       state->internal->dev_ver);
