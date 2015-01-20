@@ -14,7 +14,7 @@ diff -r 2cc595391006 experimental/dddvb/ddbridge/ddbridge-core.c
  	struct dvb_frontend *fe;
 -
 -	fe = dvb->fe = dvb_attach(drxk_attach,
--				  i2c, 0x29 + (input->nr&1),
+-				  i2c, 0x29 + (input->nr & 1),
 -				  &dvb->fe2);
 +	struct drxk_config config;
 +
