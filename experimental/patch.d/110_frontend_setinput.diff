@@ -1,0 +1,13 @@
+--- linux/include/uapi/linux/dvb/frontend.h.org	2015-01-18 23:37:47.537054968 +0100
++++ linux/include/uapi/linux/dvb/frontend.h	2014-11-01 13:51:03.418860293 +0100
+@@ -375,7 +375,9 @@ struct dvb_frontend_event {
+ #define DTV_STAT_ERROR_BLOCK_COUNT	68
+ #define DTV_STAT_TOTAL_BLOCK_COUNT	69
+ 
+-#define DTV_MAX_COMMAND		DTV_STAT_TOTAL_BLOCK_COUNT
++#define DTV_INPUT                       70
++
++#define DTV_MAX_COMMAND		DTV_INPUT
+ 
+ typedef enum fe_pilot {
+ 	PILOT_ON,
