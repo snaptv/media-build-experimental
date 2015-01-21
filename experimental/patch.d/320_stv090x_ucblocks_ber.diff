@@ -6,7 +6,7 @@ Signed-off-by: Oliver Endriss <o.endriss@gmx.de>
 
 --- linux/drivers/media/dvb-frontends/stv090x.c	2011-09-26 04:44:56.000000000 +0200
 +++ new/drivers/media/dvb-frontends/stv090x.c	2011-12-17 14:52:05.000000000 +0100
-@@ -3512,6 +3512,7 @@ static int stv090x_read_status(struct dv
+@@ -3564,6 +3564,7 @@ static int stv090x_read_status(struct dv
  	return 0;
  }
  
@@ -14,7 +14,7 @@ Signed-off-by: Oliver Endriss <o.endriss@gmx.de>
  static int stv090x_read_per(struct dvb_frontend *fe, u32 *per)
  {
  	struct stv090x_state *state = fe->demodulator_priv;
-@@ -3562,6 +3563,27 @@ err:
+@@ -3614,6 +3615,27 @@ err:
  	dprintk(FE_ERROR, 1, "I/O error");
  	return -1;
  }
@@ -42,7 +42,7 @@ Signed-off-by: Oliver Endriss <o.endriss@gmx.de>
  
  static int stv090x_table_lookup(const struct stv090x_tab *tab, int max, int val)
  {
-@@ -3682,6 +3704,26 @@ static int stv090x_read_cnr(struct dvb_f
+@@ -3734,6 +3756,26 @@ static int stv090x_read_cnr(struct dvb_f
  	return 0;
  }
  
@@ -69,7 +69,7 @@ Signed-off-by: Oliver Endriss <o.endriss@gmx.de>
  static int stv090x_set_tone(struct dvb_frontend *fe, fe_sec_tone_mode_t tone)
  {
  	struct stv090x_state *state = fe->demodulator_priv;
-@@ -4741,9 +4783,10 @@ static struct dvb_frontend_ops stv090x_o
+@@ -4929,9 +4971,10 @@ static struct dvb_frontend_ops stv090x_o
  
  	.search				= stv090x_search,
  	.read_status			= stv090x_read_status,
