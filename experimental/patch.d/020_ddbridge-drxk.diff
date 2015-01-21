@@ -1,7 +1,7 @@
 diff -r 2cc595391006 experimental/dddvb/ddbridge/ddbridge-core.c
 --- linux/drivers/media/pci/ddbridge/ddbridge-core.c.old	Tue Nov 05 08:03:36 2013 +0100
 +++ linux/drivers/media/pci/ddbridge/ddbridge-core.c	Tue Nov 05 09:18:10 2013 +0100
-@@ -889,16 +889,19 @@
+@@ -943,16 +943,19 @@
  	return status;
  }
  
@@ -24,10 +24,10 @@ diff -r 2cc595391006 experimental/dddvb/ddbridge/ddbridge-core.c
 +
 +	fe = dvb->fe = dvb_attach(drxk_attach, &config, i2c);
  	if (!fe) {
- 		printk(KERN_ERR "No DRXK found!\n");
+ 		pr_err("No DRXK found!\n");
  		return -ENODEV;
-@@ -1442,7 +1445,7 @@
- 		if (tuner_attach_stv6110(input, 1) < 0)
+@@ -1872,7 +1875,7 @@
+ 		if (tuner_attach_stv6111(input, 1) < 0)
  			return -ENODEV;
  		break;
 -#ifdef CONFIG_DVB_DRXK
