@@ -2,7 +2,7 @@ diff --git a/drivers/media/dvb-frontends/stv090x.c b/drivers/media/dvb-frontends
 index ae188a8..0ec73b6 100644
 --- a/drivers/media/dvb-frontends/stv090x.c
 +++ b/drivers/media/dvb-frontends/stv090x.c
-@@ -4996,7 +4996,7 @@ struct dvb_frontend *stv090x_attach(const struct stv090x_config *config,
+@@ -5039,7 +5039,7 @@ struct dvb_frontend *stv090x_attach(const struct stv090x_config *config,
  	if (config->diseqc_envelope_mode)
  		stv090x_send_diseqc_burst(&state->frontend, SEC_MINI_A);
  
