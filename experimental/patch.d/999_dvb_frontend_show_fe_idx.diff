@@ -1,0 +1,20 @@
+--- linux/drivers/media/dvb-core/dvb_frontend.c.orig	2015-01-23 19:43:05.311894251 +0100
++++ linux/drivers/media/dvb-core/dvb_frontend.c	2015-01-23 19:59:23.475864990 +0100
+@@ -2645,13 +2645,13 @@ int dvb_register_frontend(struct dvb_ada
+ 	fe->dvb = dvb;
+ 	fepriv->inversion = INVERSION_OFF;
+ 
+-	dev_info(fe->dvb->device,
+-			"DVB: registering adapter %i frontend %i (%s)...\n",
+-			fe->dvb->num, fe->id, fe->ops.info.name);
+-
+ 	dvb_register_device (fe->dvb, &fepriv->dvbdev, &dvbdev_template,
+ 			     fe, DVB_DEVICE_FRONTEND);
+ 
++	dev_info(fe->dvb->device,
++			"DVB: registering adapter %i frontend %i (%s)...\n",
++			fe->dvb->num, fepriv->dvbdev->id, fe->ops.info.name);
++
+ 	/*
+ 	 * Initialize the cache to the proper values according with the
+ 	 * first supported delivery system (ops->delsys[0])
