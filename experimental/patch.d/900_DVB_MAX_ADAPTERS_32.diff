@@ -1,0 +1,11 @@
+--- linux/drivers/media/dvb-core/Kconfig.org	2015-01-22 14:50:10.109874773 +0100
++++ linux/drivers/media/dvb-core/Kconfig	2015-01-22 14:50:31.777874406 +0100
+@@ -5,7 +5,7 @@
+ config DVB_MAX_ADAPTERS
+ 	int "maximum number of DVB/ATSC adapters"
+ 	depends on DVB_CORE
+-	default 8
++	default 32
+ 	range 1 255
+ 	help
+ 	  Maximum number of DVB/ATSC adapters. Increasing this number
