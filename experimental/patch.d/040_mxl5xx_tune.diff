@@ -1,0 +1,23 @@
+diff -r 474f94ea96be experimental/dddvb/frontends/mxl5xx.c
+--- a/linux/drivers/media/dvb-frontends/mxl5xx.c.orig	Sat Jan 24 05:02:35 2015 +0100
++++ b/linux/drivers/media/dvb-frontends/mxl5xx.c	Sat Jan 24 15:37:12 2015 +0100
+@@ -397,6 +397,7 @@
+ 		cfg_scrambler(state);
+ 		break;
+ 	default:
++printk("*** invalid delsys ***\n");
+ 		return -EINVAL;
+ 	}
+ 
+@@ -578,8 +579,9 @@
+ 	},
+ 	.init				= init,
+ 	.release                        = release,
+-	.get_frontend_algo              = get_algo,
+-	.tune                           = tune,
++//	.get_frontend_algo              = get_algo,
++//	.tune                           = tune,
++	.set_frontend			= set_parameters,
+ 	.read_status			= read_status,
+ 	.sleep				= sleep,
+ 	.read_snr			= read_snr,
