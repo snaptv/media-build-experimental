@@ -1,15 +1,38 @@
---- linux/drivers/media/dvb-core/dvb_frontend.c.orig	2014-11-12 05:45:09.000000000 +0100
-+++ linux/drivers/media/dvb-core/dvb_frontend.c	2015-01-18 23:15:18.225089682 +0100
-@@ -1887,6 +1887,12 @@ static int dtv_property_process_set(stru
- 			c->lna = LNA_AUTO;
+--- linux/drivers/media/dvb-core/dvb_frontend.c.orig	2015-01-24 19:05:15.542561866 +0100
++++ linux/drivers/media/dvb-core/dvb_frontend.c	2015-01-24 19:14:16.090574936 +0100
+@@ -1031,6 +1031,7 @@ static struct dtv_cmds_h dtv_cmds[DTV_MA
+ 	_DTV_CMD(DTV_STREAM_ID, 1, 0),
+ 	_DTV_CMD(DTV_DVBT2_PLP_ID_LEGACY, 1, 0),
+ 	_DTV_CMD(DTV_LNA, 1, 0),
++	_DTV_CMD(DTV_INPUT, 1, 0),
+ 
+ 	/* Get */
+ 	_DTV_CMD(DTV_DISEQC_SLAVE_REPLY, 0, 1),
+@@ -1454,6 +1455,14 @@ static int dtv_property_process_get(stru
+ 		tvp->u.data = c->lna;
  		break;
  
++	case DTV_INPUT:
++		tvp->u.buffer.data[0] = c->input;
++		tvp->u.buffer.data[1] = fe->ops.xbar[0];
++		tvp->u.buffer.data[2] = fe->ops.xbar[1];
++		tvp->u.buffer.data[3] = fe->ops.xbar[2];
++		tvp->u.buffer.len = 4;
++		break;
++
+ 	/* Fill quality measures */
+ 	case DTV_STAT_SIGNAL_STRENGTH:
+ 		tvp->u.st = c->strength;
+@@ -1885,6 +1894,12 @@ static int dtv_property_process_set(stru
+ 			r = fe->ops.set_lna(fe);
+ 		if (r < 0)
+ 			c->lna = LNA_AUTO;
++ 		break;
++
 +	case DTV_INPUT:
 +		c->input = tvp->u.data;
 +		if (fe->ops.set_input)
 +			r = fe->ops.set_input(fe, c->input);
-+		break;
-+
+ 		break;
+ 
  	default:
- 		return -EINVAL;
- 	}
