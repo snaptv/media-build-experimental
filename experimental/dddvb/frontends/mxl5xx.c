@@ -348,6 +348,25 @@ static int cfg_scrambler(struct mxl *state)
 	return send_command(state, sizeof(buf), buf);
 }
 
+static int CfgDemodAbortTune(struct mxl *state)
+{
+	MXL_HYDRA_DEMOD_ABORT_TUNE_T abortTuneCmd;
+	u8 cmdSize = sizeof(abortTuneCmd);
+	u8 cmdBuff[MXL_HYDRA_OEM_MAX_CMD_BUFF_LEN];
+	
+	abortTuneCmd.demodId = state->demod;
+	BUILD_HYDRA_CMD(MXL_HYDRA_ABORT_TUNE_CMD, MXL_CMD_WRITE, cmdSize, &abortTuneCmd, cmdBuff);
+	return send_command(state, cmdSize + MXL_HYDRA_CMD_HEADER_SIZE, &cmdBuff[0]);
+}
+
+static int send_master_cmd(struct dvb_frontend *fe,
+			   struct dvb_diseqc_master_cmd *cmd)
+{
+	struct mxl *state = fe->demodulator_priv;
+
+	return CfgDemodAbortTune(state);
+}
+
 static int set_parameters(struct dvb_frontend *fe)
 {
 	int status = 0;
@@ -369,6 +388,11 @@ static int set_parameters(struct dvb_frontend *fe)
 		{XPT_ENABLE_INPUT4}, {XPT_ENABLE_INPUT5},
 		{XPT_ENABLE_INPUT6}, {XPT_ENABLE_INPUT7} };
 #endif
+
+	if (p->frequency == 0 || p->symbol_rate == 0)
+		return -EINVAL;
+	
+	CfgDemodAbortTune(state);
 	
 	switch (p->delivery_system) {
 	case SYS_DSS:
@@ -384,12 +408,13 @@ static int set_parameters(struct dvb_frontend *fe)
 		demodChanCfg.rollOff = MXL_HYDRA_ROLLOFF_AUTO;
 		demodChanCfg.modulationScheme = MXL_HYDRA_MOD_AUTO;
 		demodChanCfg.pilots = MXL_HYDRA_PILOTS_AUTO;
-		cfg_scrambler(state);
+		//cfg_scrambler(state);
 		break;
 	default:
 		return -EINVAL;
 	}
 
+	
 #if 0
 	update_by_mnemonic(state,
 			   xpt_enable_dvb_input[demodId].regAddr,
@@ -402,8 +427,10 @@ static int set_parameters(struct dvb_frontend *fe)
 	demodChanCfg.frequencyInHz = p->frequency * 1000;
 	demodChanCfg.symbolRateInHz = p->symbol_rate;
 	demodChanCfg.maxCarrierOffsetInMHz = 10;
-	demodChanCfg.spectrumInversion = MXL_HYDRA_SPECTRUM_NON_INVERTED;
+	demodChanCfg.spectrumInversion = MXL_HYDRA_SPECTRUM_AUTO;
 	demodChanCfg.fecCodeRate = MXL_HYDRA_FEC_AUTO;
+
+//	printk("std %u freq %u\n", demodChanCfg.standard, demodChanCfg.symbolRateInHz);
 
 #if 0
 	if (p->delivery_system == SYS_DSS)
@@ -469,6 +496,7 @@ static int tune(struct dvb_frontend *fe, bool re_tune,
 	if (r)
 		return r;
 
+#if 0
 	if (*status & FE_HAS_LOCK)
 		return 0;
 
@@ -477,6 +505,7 @@ static int tune(struct dvb_frontend *fe, bool re_tune,
 	else
 		p->delivery_system = SYS_DVBS;
 	set_parameters(fe);
+#endif
 
 	return 0;
 }
@@ -588,6 +617,7 @@ static struct dvb_frontend_ops mxl_ops = {
 	.read_ucblocks			= read_ucblocks,
 	.get_frontend                   = get_frontend,
 	.set_input                      = set_input,
+	.diseqc_send_master_cmd		= send_master_cmd,
 };
 
 static struct mxl_base *match_base(struct i2c_adapter  *i2c, u8 adr)
