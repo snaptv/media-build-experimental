@@ -419,7 +419,10 @@ static inline u32 ddbreadb(struct ddb *dev, u32 adr)
 	return readb((char *) (dev->regs + (adr)));
 }
 
-static inline void ddbwritel(struct ddb *dev, u32 val, u32 adr);
+static inline u32 _ddbreadl(struct ddb *dev, u32 adr)
+{
+	return readl((char *) (dev->regs + (adr)));
+}
 
 static inline u32 ddbreadl(struct ddb *dev, u32 adr)
 {
@@ -428,7 +431,7 @@ static inline u32 ddbreadl(struct ddb *dev, u32 adr)
 		u32 val;
 		
 		spin_lock_irqsave(&dev->gtl_lock, flags);
-		while (1 & ddbreadl(dev, 0x194));
+		while (1 & _ddbreadl(dev, 0x194));
 		writel(adr & 0xfffc, (char *) (dev->regs + (0x194)));
 		writel(3, (char *) (dev->regs + (0x190)));
 		val = readl((char *) (dev->regs + (0x19c)));
@@ -438,16 +441,21 @@ static inline u32 ddbreadl(struct ddb *dev, u32 adr)
 	return readl((char *) (dev->regs + (adr)));
 }
 
+static inline void _ddbwritel(struct ddb *dev, u32 val, u32 adr)
+{
+	writel(val, (char *) (dev->regs + (adr)));
+}
+
 static inline void ddbwritel(struct ddb *dev, u32 val, u32 adr)
 {
 	if (unlikely(adr & 0x80000000)) {
 		unsigned long flags;
 		
 		spin_lock_irqsave(&dev->gtl_lock, flags);
-		while (1 & ddbreadl(dev, 0x194));
-		ddbwritel(dev, adr & 0xfffc, 0x194);
-		ddbwritel(dev, val, 0x198);
-		ddbwritel(dev, 1, 0x190);
+		while (1 & _ddbreadl(dev, 0x194));
+		_ddbwritel(dev, adr & 0xfffc, 0x194);
+		_ddbwritel(dev, val, 0x198);
+		_ddbwritel(dev, 1, 0x190);
 		spin_unlock_irqrestore(&dev->gtl_lock, flags);
 		return;
 	}
