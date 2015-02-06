@@ -1,0 +1,24 @@
+--- linux/drivers/media/pci/saa716x/saa716x_budget.c.orig	2013-03-01 15:41:29.000000000 +0100
++++ linux/drivers/media/pci/saa716x/saa716x_budget.c	2015-02-06 22:18:43.391272126 +0100
+@@ -497,10 +497,10 @@ static int skystar2_set_voltage(struct d
+ 		break;
+ 	}
+ 
+-	err = stv090x_set_gpio(fe, 2, 0, en, 0);
++	err = skystar2_stv090x_config.set_gpio(fe, 2, 0, en, 0);
+ 	if (err < 0)
+ 		goto exit;
+-	err = stv090x_set_gpio(fe, 3, 0, sel, 0);
++	err = skystar2_stv090x_config.set_gpio(fe, 3, 0, sel, 0);
+ 	if (err < 0)
+ 		goto exit;
+ 
+@@ -519,7 +519,7 @@ static int skystar2_voltage_boost(struct
+ 	else
+ 		value = 0;
+ 
+-	err = stv090x_set_gpio(fe, 4, 0, value, 0);
++	err = skystar2_stv090x_config.set_gpio(fe, 4, 0, value, 0);
+ 	if (err < 0)
+ 		goto exit;
+ 
