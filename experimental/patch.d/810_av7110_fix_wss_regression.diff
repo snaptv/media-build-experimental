@@ -6,7 +6,7 @@ Signed-off-by: Oliver Endriss <o.endriss@gmx.de>
 
 --- a/linux/drivers/media/common/saa7146/saa7146_fops.c	2012-12-28 00:04:05.000000000 +0100
 +++ b/linux/drivers/media/common/saa7146/saa7146_fops.c 2013-03-09 04:59:26.640464994 +0100
-@@ -604,8 +605,11 @@ int saa7146_register_device(struct video
+@@ -598,8 +599,11 @@ int saa7146_register_device(struct video
  	vfd->fops = &video_fops;
  	if (type == VFL_TYPE_GRABBER)
  		vfd->ioctl_ops = &dev->ext_vv_data->vid_ops;
@@ -16,6 +16,6 @@ Signed-off-by: Oliver Endriss <o.endriss@gmx.de>
 +		if (dev->ext_vv_data->capabilities & V4L2_CAP_SLICED_VBI_OUTPUT)
 +			vfd->vfl_dir = VFL_DIR_TX;
 +	}
- 	vfd->release = video_device_release;
+ 	vfd->release = video_device_release_empty;
  	vfd->lock = &dev->v4l2_lock;
  	vfd->v4l2_dev = &dev->v4l2_dev;
