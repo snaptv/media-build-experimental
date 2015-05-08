@@ -1,8 +1,9 @@
 /*
  * octonet.c: Digital Devices network tuner driver
  *
- * Copyright (C) 2012-14 Digital Devices GmbH
- *                       Ralph Metzler <rmetzler@digitaldevices.de>
+ * Copyright (C) 2012-15 Digital Devices GmbH
+ *                       Marcus Metzler <mocm@metzlerbros.de>
+ *                       Ralph Metzler <rjkm@metzlerbros.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,7 +25,6 @@
 
 #include "ddbridge.h"
 #include "ddbridge-regs.h"
-
 #include <asm-generic/pci-dma-compat.h>
 
 static int adapter_alloc = 3;
@@ -68,6 +68,7 @@ static struct ddb_info ddb_octonet = {
 	.name     = "Digital Devices OctopusNet network DVB adapter",
 	.regmap   = &octopus_net_map,
 	.port_num = 4,
+	.i2c_mask = 0x0f,
 	.ns_num   = 12,
 	.mdio_num = 1,
 };
@@ -77,36 +78,20 @@ static struct ddb_info ddb_octonet_jse = {
 	.name     = "Digital Devices OctopusNet network DVB adapter JSE",
 	.regmap   = &octopus_net_map,
 	.port_num = 4,
+	.i2c_mask = 0x0f,
 	.ns_num   = 15,
 	.mdio_num = 1,
 };
 
-static struct ddb_regset octopus_gtl_i2c = {
-	.base = 0x80000080,
-	.num  = 0x01,
-	.size = 0x20,
-};
-
-static struct ddb_regset octopus_gtl_i2c_buf = {
-	.base = 0x80001000,
-	.num  = 0x04,
-	.size = 0x200,
-};
-
-static struct ddb_regmap octopus_net_gtlmap = {
-	.i2c = &octopus_gtl_i2c,
-	.i2c_buf = &octopus_gtl_i2c_buf,
-	.gtl = &octopus_gtl,
-};
-
-static struct ddb_info ddb_octonet_ser = {
+static struct ddb_info ddb_octonet_gtl = {
 	.type     = DDB_OCTONET,
 	.name     = "Digital Devices OctopusNet GTL",
 	.regmap   = &octopus_net_gtl,
-	.regmap_gtl = &octopus_net_gtlmap,
-	.port_num = 1,
+	.port_num = 4,
+	.i2c_mask = 0x05,
 	.ns_num   = 12,
 	.mdio_num = 1,
+	.con_clock = 1,
 };
 
 static struct ddb_info ddb_octonet_tbd = {
@@ -165,6 +150,7 @@ static int __init octonet_probe(struct platform_device *pdev)
 	dev_info(dev->dev, "regs_start=%08x regs_len=%08x\n",
 		 (u32) regs->start, (u32) dev->regs_len);
 	dev->regs = ioremap(regs->start, dev->regs_len);
+
 	if (!dev->regs) {
 		dev_err(dev->dev, "ioremap failed\n");
 		return -ENOMEM;
@@ -180,15 +166,16 @@ static int __init octonet_probe(struct platform_device *pdev)
 	dev->ids.subvendor = dev->ids.devid & 0xffff;
 	dev->ids.subdevice = dev->ids.devid >> 16;
 
+	dev->link[0].dev = dev;
 	if (dev->ids.devid == 0x0300dd01)
-		dev->info = &ddb_octonet;
+		dev->link[0].info = &ddb_octonet;
 	else if (dev->ids.devid == 0x0301dd01)
-		dev->info = &ddb_octonet_jse;
+		dev->link[0].info = &ddb_octonet_jse;
 	else if (dev->ids.devid == 0x0307dd01)
-		dev->info = &ddb_octonet_ser;
+		dev->link[0].info = &ddb_octonet_gtl;
 	else
-		dev->info = &ddb_octonet_tbd;
-	
+		dev->link[0].info = &ddb_octonet_tbd;
+		
 	pr_info("HW  %08x REGMAP %08x\n", dev->ids.hwid, dev->ids.regmapid);
 	pr_info("MAC %08x DEVID  %08x\n", dev->ids.mac, dev->ids.devid);
 
@@ -202,15 +189,11 @@ static int __init octonet_probe(struct platform_device *pdev)
 	irq = platform_get_irq(dev->pfdev, 0);
 	if (irq < 0)
 		goto fail;
-	
 	if (request_irq(irq, irq_handler,
 			IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,
 			"octonet-dvb", (void *) dev) < 0)
 		goto fail;
-
 	ddbwritel(dev, 0x0fffff0f, INTERRUPT_ENABLE);
-	ddbwritel(dev, 0x1, ETHER_CONTROL);
-	ddbwritel(dev, 14 + (vlan ? 4 : 0), ETHER_LENGTH);
 
 	if (ddb_init(dev) == 0)
 		return 0;
@@ -274,4 +257,4 @@ module_exit(exit_octonet);
 MODULE_DESCRIPTION("GPL");
 MODULE_AUTHOR("Marcus and Ralph Metzler, Metzler Brothers Systementwicklung GbR");
 MODULE_LICENSE("GPL");
-MODULE_VERSION("0.5");
+MODULE_VERSION("0.6");
