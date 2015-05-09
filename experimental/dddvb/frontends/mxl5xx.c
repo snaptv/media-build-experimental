@@ -436,7 +436,7 @@ static int set_parameters(struct dvb_frontend *fe)
 		while (time_before(jiffies, state->base->next_tune))
 			msleep(10);
 	state->base->next_tune = jiffies + msecs_to_jiffies(100);
-	pr_info("mxl5xx tune\n");
+	/* pr_info("mxl5xx tune\n"); */
 	BUILD_HYDRA_CMD(MXL_HYDRA_DEMOD_SET_PARAM_CMD, MXL_CMD_WRITE,
 			cmdSize, &demodChanCfg, cmdBuff);
 	stat = send_command(state, cmdSize + MXL_HYDRA_CMD_HEADER_SIZE, &cmdBuff[0]);
