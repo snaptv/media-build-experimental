@@ -1,6 +1,6 @@
 --- linux/drivers/media/dvb-frontends/Kconfig.old	2014-11-04 05:45:07.000000000 +0100
 +++ linux/drivers/media/dvb-frontends/Kconfig	2015-01-23 21:51:05.631664506 +0100
-@@ -35,6 +35,29 @@ config DVB_STV6110x
+@@ -35,6 +35,36 @@ config DVB_STV6110x
  	help
  	  A Silicon tuner that supports DVB-S and DVB-S2 modes
  
@@ -18,6 +18,13 @@
 +	default m if !MEDIA_SUBDRV_AUTOSELECT
 +	help
 +	  A Silicon tuner that supports DVB-S and DVB-S2 modes
++
++config DVB_LNBH25
++	tristate "LNBH25 SEC controller"
++	depends on DVB_CORE && I2C
++	default m if !MEDIA_SUBDRV_AUTOSELECT
++	help
++	   Driver for the LNBH25 SEC control chip.
 +
 +config DVB_MXL5XX
 +	tristate "Maxlinear MX58x based"
