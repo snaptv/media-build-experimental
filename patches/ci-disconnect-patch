@@ -1,4 +1,4 @@
-From d0fb3fee815244f6a011f3acb71cdd0fc377b61e Mon Sep 17 00:00:00 2001
+From b2c80980fa0d4d8e51529114d9ebc1f005fc2066 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?P=C3=A5l=20Saugstad?= <pals@snap.tv>
 Date: Mon, 16 Dec 2013 16:29:45 +0100
 Subject: =?UTF-8?q?Let=20the=20driver=20interface=20make=20it=20possible?=
@@ -14,15 +14,15 @@ connected. With this modification, the higher level can instruct
 the source to disconnect from any CI resource it might be
 connected to, regardless of which CI was connected before.
 ---
- drivers/media/dvb/ddbridge/ddbridge-core.c | 22 +++++++++++++++++++++-
+ drivers/media/dvb/ddbridge/ddbridge-core.c | 19 +++++++++++++++++++
  drivers/media/dvb/ddbridge/ddbridge.h      |  1 +
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ 2 files changed, 20 insertions(+)
 
 diff --git a/drivers/media/dvb/ddbridge/ddbridge-core.c b/drivers/media/dvb/ddbridge/ddbridge-core.c
-index 4b97908..5574c44 100644
+index 68e71ce..537e079 100644
 --- a/drivers/media/dvb/ddbridge/ddbridge-core.c
 +++ b/drivers/media/dvb/ddbridge/ddbridge-core.c
-@@ -413,6 +413,22 @@ done:
+@@ -145,6 +145,22 @@ done:
  	return 0;
  }
  
@@ -45,26 +45,16 @@ index 4b97908..5574c44 100644
  static int ddb_redirect(u32 i, u32 p)
  {
  	struct ddb *idev = ddbs[(i >> 4) & 0x1f];
-@@ -420,6 +436,8 @@ static int ddb_redirect(u32 i, u32 p)
+@@ -152,6 +168,8 @@ static int ddb_redirect(u32 i, u32 p)
  	struct ddb *pdev = ddbs[(p >> 4) & 0x1f];
  	struct ddb_port *port;
  
-+        if (p == 8) return disconnect_input(i);
++	if (p == 8) return disconnect_input(i);
 +
- 	if (!idev || !pdev)
+ 	if (!idev->has_dma || !pdev->has_dma)
  		return -EINVAL;
- 
-@@ -441,7 +459,8 @@ static int ddb_redirect(u32 i, u32 p)
- 		mutex_unlock(&redirect_lock);
- 		return -EBUSY;
- 	}
--	if ((input2 = port->input[0])) {
-+	input2 = port->input[0];
-+	if (input2) {
- 		if (input->redi) {
- 			input2->redi = input->redi;
- 			input->redi = 0;
-@@ -449,6 +468,7 @@ static int ddb_redirect(u32 i, u32 p)
+ 	if (!idev || !pdev)
+@@ -184,6 +202,7 @@ static int ddb_redirect(u32 i, u32 p)
  			input2->redi = input;
  	}
  	input->redo = port->output;
@@ -73,17 +63,17 @@ index 4b97908..5574c44 100644
  
  	ddb_redirect_dma(input->port->dev, input->dma, port->output->dma);
 diff --git a/drivers/media/dvb/ddbridge/ddbridge.h b/drivers/media/dvb/ddbridge/ddbridge.h
-index b5796e9..3cc5905 100644
+index 93423e3..cc5f436 100644
 --- a/drivers/media/dvb/ddbridge/ddbridge.h
 +++ b/drivers/media/dvb/ddbridge/ddbridge.h
-@@ -134,6 +134,7 @@ struct ddb_io {
- 	struct ddb_io         *redirect;
+@@ -239,6 +239,7 @@ struct ddb_io {
+ 	struct ddb_dma        *dma;
  	struct ddb_io         *redo;
  	struct ddb_io         *redi;
 +	struct ddb_port       *connected_ci_port;	
  };
  
- #if 0
+ #define ddb_output ddb_io
 -- 
 1.9.1
 
