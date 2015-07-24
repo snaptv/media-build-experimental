@@ -1,0 +1,1 @@
+s/\/drivers\/media\/dvb\//\/linux\/drivers\/media\/pci\//g
