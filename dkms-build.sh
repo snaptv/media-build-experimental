@@ -47,31 +47,6 @@ done < modules
 sudo mv dkms.conf /usr/src/$NAME-$FULL_VERSION
 git clean -fd
 
-
-sudo dkms build   $ID -k $KERNEL_VERSION_ARCH
-sudo dkms install $ID -k $KERNEL_VERSION_ARCH
-ls -l /lib/modules/$KERNEL_VERSION/updates/dkms/ | egrep '\.ko$' | awk '{print $NF}' | sed s/\.ko$// | sort >real-modules
-sudo dkms remove $ID -k $KERNEL_VERSION
-
-# Produce config file again with the real installed subset of the driver modules
-
-echo "
-PACKAGE_NAME=$NAME
-PACKAGE_VERSION=$FULL_VERSION
-AUTOINSTALL=y
-MAKE[0]='make -j4 all'
-BUILD_EXCLUSIVE_KERNEL='^$KERNEL_VERSION'" > dkms.conf
-
-num=0
-while read module
-do
-    echo BUILT_MODULE_NAME["$num"]="$module" >> dkms.conf
-    echo BUILT_MODULE_LOCATION["$num"]=./v4l >> dkms.conf
-    echo DEST_MODULE_LOCATION["$num"]=/updates/dkms >> dkms.conf
-    num=$((num+1))
-done < real-modules
-
-sudo mv dkms.conf /usr/src/$NAME-$FULL_VERSION
 sudo dkms build $ID -k $KERNEL_VERSION_ARCH
 
 sudo dkms mkdeb $ID -k $KERNEL_VERSION_ARCH --binaries-only
