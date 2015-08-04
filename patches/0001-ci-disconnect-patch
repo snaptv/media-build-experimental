@@ -18,10 +18,10 @@ connected to, regardless of which CI was connected before.
  drivers/media/dvb/ddbridge/ddbridge.h      |  1 +
  2 files changed, 20 insertions(+)
 
-diff --git a/drivers/media/dvb/ddbridge/ddbridge-core.c b/drivers/media/dvb/ddbridge/ddbridge-core.c
+diff --git a/linux/drivers/media/pci/ddbridge/ddbridge-core.c b/linux/drivers/media/pci/ddbridge/ddbridge-core.c
 index 68e71ce..537e079 100644
---- a/drivers/media/dvb/ddbridge/ddbridge-core.c
-+++ b/drivers/media/dvb/ddbridge/ddbridge-core.c
+--- a/linux/drivers/media/pci/ddbridge/ddbridge-core.c
++++ b/linux/drivers/media/pci/ddbridge/ddbridge-core.c
 @@ -145,6 +145,22 @@ done:
  	return 0;
  }
@@ -62,10 +62,10 @@ index 68e71ce..537e079 100644
  	port->output->redi = input;
  
  	ddb_redirect_dma(input->port->dev, input->dma, port->output->dma);
-diff --git a/drivers/media/dvb/ddbridge/ddbridge.h b/drivers/media/dvb/ddbridge/ddbridge.h
+diff --git a/linux/drivers/media/pci/ddbridge/ddbridge.h b/linux/drivers/media/pci/ddbridge/ddbridge.h
 index 93423e3..cc5f436 100644
---- a/drivers/media/dvb/ddbridge/ddbridge.h
-+++ b/drivers/media/dvb/ddbridge/ddbridge.h
+--- a/linux/drivers/media/pci/ddbridge/ddbridge.h
++++ b/linux/drivers/media/pci/ddbridge/ddbridge.h
 @@ -239,6 +239,7 @@ struct ddb_io {
  	struct ddb_dma        *dma;
  	struct ddb_io         *redo;
