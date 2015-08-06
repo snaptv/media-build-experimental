@@ -6,7 +6,7 @@ set -e
 
 HASH=$(git describe --dirty --always)
 
-NAME=snaptv-dddvb-extra
+NAME=snaptv-dddvb-analog
 VERSION=0.9.18
 
 KERNEL_VERSION=4.0.6-040006-generic
