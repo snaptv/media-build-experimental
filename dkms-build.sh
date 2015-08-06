@@ -2,9 +2,11 @@
 
 # Script that produces the debian package of the drivers (dkms-binary-style)
 
+set -e
+
 HASH=$(git describe --dirty --always)
 
-NAME=snaptv-media-build-experimental
+NAME=snaptv-dddvb-analog
 VERSION=0.9.18
 
 KERNEL_VERSION=4.0.6-040006-generic
@@ -15,10 +17,11 @@ FULL_VERSION=$VERSION~$HASH
 ID=$NAME/$FULL_VERSION
 LIB_DIR=/var/lib/dkms/$ID
 
-CHANGES=$(git status --porcelain | egrep '^ M ')
+CHANGES=$(git status --porcelain)
 
-if [ "$CHANGES" != "" ]; then
+if [ "s$CHANGES" != "s" ]; then
     echo Error: Repo must be clean
+    echo $CHANGES
     exit
 fi
 
@@ -29,14 +32,10 @@ for file in $(find patches -type f | sort) ; do
     patch -p1 <$file
 done
 
-sudo rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION
+echo rsync all files including patching to /usr/src/$NAME-$FULL_VERSION
+sudo rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION >/dev/null
 
-make all
-
-modules=$(ls -l v4l | egrep '\.ko$' | awk '{print $NF}' | sed s/\.ko$// | sort)
-
-echo $modules
-
+modules=$(cat modules)
 
 echo "
 PACKAGE_NAME=$NAME
@@ -56,31 +55,7 @@ sudo mv dkms.conf /usr/src/$NAME-$FULL_VERSION
 git clean -fd
 
 
-sudo dkms build   $ID -k $KERNEL_VERSION_ARCH
-sudo dkms install $ID -k $KERNEL_VERSION_ARCH
-real_modules=$(ls -l /lib/modules/$KERNEL_VERSION/updates/dkms/ | egrep '\.ko$' | awk '{print $NF}' | sed s/\.ko$// | sort)
-sudo dkms remove $ID -k $KERNEL_VERSION
-
-# Produce config file again with the real installed subset of the driver modules
-
-echo "
-PACKAGE_NAME=$NAME
-PACKAGE_VERSION=$FULL_VERSION
-AUTOINSTALL=y
-MAKE[0]='make -j4 all'
-BUILD_EXCLUSIVE_KERNEL='^$KERNEL_VERSION'" > dkms.conf
-
-num=0
-for module in $real_modules; do
-    echo BUILT_MODULE_NAME["$num"]="$module" >> dkms.conf
-    echo BUILT_MODULE_LOCATION["$num"]=./v4l >> dkms.conf
-    echo DEST_MODULE_LOCATION["$num"]=/updates/dkms >> dkms.conf
-    num=$((num+1))
-done
-
-sudo mv dkms.conf /usr/src/$NAME-$FULL_VERSION
 sudo dkms build $ID -k $KERNEL_VERSION_ARCH
-
 sudo dkms mkdeb $ID -k $KERNEL_VERSION_ARCH --binaries-only
 
 DEB=$(find $LIB_DIR/deb/ -type f)
