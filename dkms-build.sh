@@ -2,6 +2,8 @@
 
 # Script that produces the debian package of the drivers (dkms-binary-style)
 
+set -e
+
 HASH=$(git describe --dirty --always)
 
 NAME=snaptv-media-build-experimental
@@ -15,10 +17,11 @@ FULL_VERSION=$VERSION~$HASH
 ID=$NAME/$FULL_VERSION
 LIB_DIR=/var/lib/dkms/$ID
 
-CHANGES=$(git status --porcelain | egrep '^ M ')
+CHANGES=$(git status --porcelain)
 
-if [ "$CHANGES" != "" ]; then
+if [ "s$CHANGES" != "s" ]; then
     echo Error: Repo must be clean
+    echo $CHANGES
     exit
 fi
 
@@ -29,7 +32,8 @@ for file in $(find patches -type f | sort) ; do
     patch -p1 <$file
 done
 
-sudo rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION
+echo rsync all files including patching to /usr/src/$NAME-$FULL_VERSION
+sudo rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION >/dev/null
 
 make all
 
