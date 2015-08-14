@@ -9,7 +9,7 @@ HASH=$(git describe --dirty --always)
 NAME=snaptv-dddvb-analog
 VERSION=0.9.18
 
-KERNEL_VERSION=3.13.0-61-generic
+KERNEL_VERSION=3.2.0-82-lowlatency
 KERNEL_ARCH=x86_64
 
 KERNEL_VERSION_ARCH=$KERNEL_VERSION/$KERNEL_ARCH
