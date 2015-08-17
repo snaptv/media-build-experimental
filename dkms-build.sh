@@ -1,16 +1,28 @@
-#!/bin/bash
+#!/bin/bash -eux
 
 # Script that produces the debian package of the drivers (dkms-binary-style)
-
-set -e
-
-HASH=$(git describe --dirty --always)
 
 NAME=snaptv-dddvb-analog
 VERSION=0.9.18
 
 KERNEL_VERSION=3.13.0-61-lowlatency
 KERNEL_ARCH=x86_64
+
+apt-get update
+apt-get install -y \
+        bzip2 \
+        debhelper \
+        dkms \
+        dpkg-dev \
+        git \
+        libproc-processtable-perl \
+        mercurial \
+        linux-headers-$KERNEL_VERSION \
+        sudo \
+        wget
+
+HASH=$(git describe --dirty --always)
+
 
 KERNEL_VERSION_ARCH=$KERNEL_VERSION/$KERNEL_ARCH
 FULL_VERSION=$VERSION~$HASH
@@ -69,7 +81,6 @@ sudo dpkg -x $DEB x
 sudo dpkg -e $DEB x/DEBIAN
 sudo mkdir -p x/usr/src/"$NAME"-"$FULL_VERSION"
 sudo cp /usr/src/"$NAME"-"$FULL_VERSION"/dkms.conf x/usr/src/"$NAME"-"$FULL_VERSION"
-sudo cd x && md5sum $(find usr -type f) >DEBIAN/md5sums
 sudo dpkg -b x ~
 
 popd
