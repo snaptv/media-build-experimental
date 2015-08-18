@@ -18,7 +18,6 @@ apt-get install -y \
         libproc-processtable-perl \
         mercurial \
         linux-headers-$KERNEL_VERSION \
-        sudo \
         wget
 
 HASH=$(git describe --dirty --always)
@@ -45,7 +44,7 @@ for file in $(find patches -type f | sort) ; do
 done
 
 echo rsync all files including patching to /usr/src/$NAME-$FULL_VERSION
-sudo rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION >/dev/null
+rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION >/dev/null
 
 modules=$(cat modules)
 
@@ -63,12 +62,12 @@ for module in $modules; do
     num=$((num+1))
 done
 
-sudo mv dkms.conf /usr/src/$NAME-$FULL_VERSION
+mv dkms.conf /usr/src/$NAME-$FULL_VERSION
 git clean -fd
 
 
-sudo dkms build $ID -k $KERNEL_VERSION_ARCH
-sudo dkms mkdeb $ID -k $KERNEL_VERSION_ARCH --binaries-only
+dkms build $ID -k $KERNEL_VERSION_ARCH
+dkms mkdeb $ID -k $KERNEL_VERSION_ARCH --binaries-only
 
 DEB=$(find $LIB_DIR/deb/ -type f)
 echo $DEB
@@ -77,13 +76,13 @@ echo $DEB
 
 mkdir -p ~/"$HASH"/x/DEBIAN
 pushd ~/"$HASH"
-sudo dpkg -x $DEB x
-sudo dpkg -e $DEB x/DEBIAN
-sudo mkdir -p x/usr/src/"$NAME"-"$FULL_VERSION"
-sudo cp /usr/src/"$NAME"-"$FULL_VERSION"/dkms.conf x/usr/src/"$NAME"-"$FULL_VERSION"
-sudo dpkg -b x ~
+dpkg -x $DEB x
+dpkg -e $DEB x/DEBIAN
+mkdir -p x/usr/src/"$NAME"-"$FULL_VERSION"
+cp /usr/src/"$NAME"-"$FULL_VERSION"/dkms.conf x/usr/src/"$NAME"-"$FULL_VERSION"
+dpkg -b x ~
 
 popd
-sudo dkms remove $ID -k $KERNEL_VERSION
-sudo rm -fr /usr/src/"$NAME"-"$FULL_VERSION"
-sudo rm -fr ~/"$HASH"
+dkms remove $ID -k $KERNEL_VERSION
+rm -fr /usr/src/"$NAME"-"$FULL_VERSION"
+rm -fr ~/"$HASH"
