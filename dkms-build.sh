@@ -8,17 +8,20 @@ VERSION=0.9.18
 KERNEL_VERSION=3.13.0-61-lowlatency
 KERNEL_ARCH=x86_64
 
-apt-get update
-apt-get install -y \
-        bzip2 \
-        debhelper \
-        dkms \
-        dpkg-dev \
-        git \
-        libproc-processtable-perl \
-        mercurial \
-        linux-headers-$KERNEL_VERSION \
-        wget
+# skip install if invoked with any argument (for development purposes)
+if [ $# -eq 0 ]; then
+    apt-get update
+    apt-get install -y \
+            bzip2 \
+            debhelper \
+            dkms \
+            dpkg-dev \
+            git \
+            libproc-processtable-perl \
+            mercurial \
+            linux-headers-$KERNEL_VERSION \
+            wget
+fi
 
 HASH=$(git describe --dirty --always)
 
