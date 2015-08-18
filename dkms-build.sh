@@ -68,6 +68,13 @@ done
 mv dkms.conf /usr/src/$NAME-$FULL_VERSION
 git clean -fd
 
+# copy template
+sudo rsync -uav /etc/dkms/template-dkms-mkdeb/ /usr/src/$NAME-$FULL_VERSION/$NAME-dkms-mkdeb/
+
+# manipulate postinst, dkms install to the correct kernel
+sed s/\\tdkms_configure/\\t"dkms_configure \&\& dkms install -m"\ $NAME\ -v\ $FULL_VERSION\ -k\ $KERNEL_VERSION/ </usr/src/$NAME-$FULL_VERSION/$NAME-dkms-mkdeb/debian/postinst >postinst
+chmod 755 postinst
+mv postinst /usr/src/$NAME-$FULL_VERSION/$NAME-dkms-mkdeb/debian/
 
 dkms build $ID -k $KERNEL_VERSION_ARCH
 dkms mkdeb $ID -k $KERNEL_VERSION_ARCH --binaries-only
