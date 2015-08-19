@@ -24,10 +24,11 @@ if [ $# -eq 0 ]; then
 fi
 
 HASH=$(git describe --dirty --always)
+LONGVER=$(snap-make-changelog -c | head -1)
 
 
 KERNEL_VERSION_ARCH=$KERNEL_VERSION/$KERNEL_ARCH
-FULL_VERSION=$VERSION~$HASH
+FULL_VERSION=$VERSION-snaptv-$LONGVER
 ID=$NAME/$FULL_VERSION
 LIB_DIR=/var/lib/dkms/$ID
 
