@@ -10,7 +10,6 @@ KERNEL_ARCH=x86_64
 
 # skip install if invoked with any argument (for development purposes)
 if [ $# -eq 0 ]; then
-    curl http://apt.snap.tv/bootstrap.sh | sh
     apt-get update
     apt-get install -y \
             bzip2 \
@@ -22,6 +21,10 @@ if [ $# -eq 0 ]; then
             mercurial \
             linux-headers-$KERNEL_VERSION \
             wget \
+            curl
+    curl http://apt.snap.tv/bootstrap.sh | sh
+    apt-get update
+    apt-get install -y \
             snaptv-package-builder
 fi
 
