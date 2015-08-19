@@ -22,7 +22,7 @@ if [ $# -eq 0 ]; then
             linux-headers-$KERNEL_VERSION \
             wget \
             curl
-    curl http://apt.snap.tv/bootstrap.sh | sh
+    curl http://apt.snap.tv/bootstrap.sh | sh -s master
     apt-get update
     apt-get install -y \
             snaptv-package-builder
