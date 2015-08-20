@@ -78,7 +78,10 @@ git clean -fd
 sudo rsync -uav /etc/dkms/template-dkms-mkdeb/ /usr/src/$NAME-$FULL_VERSION/$NAME-dkms-mkdeb/
 
 # manipulate postinst, dkms install to the correct kernel
-sed s/\\tdkms_configure/\\t"dkms_configure \&\& dkms install -m"\ $NAME\ -v\ $FULL_VERSION\ -k\ $KERNEL_VERSION/ </usr/src/$NAME-$FULL_VERSION/$NAME-dkms-mkdeb/debian/postinst >postinst
+sed s/\\tdkms_configure/"\
+\\tdkms ldtarball \/usr\/share\/$NAME-dkms\/$NAME-$FULL_VERSION.dkms.tar.gz\\n\
+\\tdkms install -m $NAME -v $FULL_VERSION -k $KERNEL_VERSION\
+"/ </usr/src/$NAME-$FULL_VERSION/$NAME-dkms-mkdeb/debian/postinst >postinst
 # manipulate control, set dependent of kernel
 sed s/Depends:/"Depends: linux-headers-$KERNEL_VERSION, linux-image-$KERNEL_VERSION,"/ </usr/src/$NAME-$FULL_VERSION/$NAME-dkms-mkdeb/debian/control >control
 chmod 755 postinst
