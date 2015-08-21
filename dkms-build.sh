@@ -64,6 +64,7 @@ done
 
 mv dkms.conf /usr/src/$NAME-$FULL_VERSION
 git clean -fd
+git checkout .
 
 # copy template
 sudo rsync -uav /etc/dkms/template-dkms-mkdeb/ /usr/src/$NAME-$FULL_VERSION/$NAME-dkms-mkdeb/
