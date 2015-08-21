@@ -37,15 +37,6 @@ FULL_VERSION=$VERSION-snaptv-$LONGVER
 ID=$NAME/$FULL_VERSION
 LIB_DIR=/var/lib/dkms/$ID
 
-CHANGES=$(git status --porcelain)
-
-if [ "s$CHANGES" != "s" ]; then
-    echo Error: Repo must be clean
-    echo $CHANGES
-    exit
-fi
-
-
 make download untar
 
 for file in $(find patches -type f | sort) ; do
