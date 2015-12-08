@@ -43,9 +43,6 @@ for file in $(find patches -type f | sort) ; do
     patch -p1 <$file
 done
 
-echo rsync all files including patching to /usr/src/$NAME-$FULL_VERSION
-rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION >/dev/null
-
 modules=$(cat modules)
 
 echo "
@@ -62,9 +59,7 @@ for module in $modules; do
     num=$((num+1))
 done
 
-mv dkms.conf /usr/src/$NAME-$FULL_VERSION
-git clean -fd
-git checkout .
+rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION >/dev/null
 
 # copy template
 sudo rsync -uav /etc/dkms/template-dkms-mkdeb/ /usr/src/$NAME-$FULL_VERSION/$NAME-dkms-mkdeb/
