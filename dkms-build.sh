@@ -8,6 +8,7 @@ VERSION=0.9.18
 KERNEL_VERSION=3.13.0-61-lowlatency
 KERNEL_ARCH=x86_64
 
+rebuild=0
 # skip install if invoked with any argument (for development purposes)
 if [ $# -eq 0 ]; then
     apt-get update
@@ -26,6 +27,10 @@ if [ $# -eq 0 ]; then
     apt-get update
     apt-get install -y \
             snaptv-package-builder
+else
+    if [ "$1" == "r" ]; then
+        rebuild=1
+    fi
 fi
 
 HASH=$(git describe --dirty --always)
@@ -36,6 +41,8 @@ KERNEL_VERSION_ARCH=$KERNEL_VERSION/$KERNEL_ARCH
 FULL_VERSION=$VERSION-snaptv-$LONGVER
 ID=$NAME/$FULL_VERSION
 LIB_DIR=/var/lib/dkms/$ID
+
+if [ $rebuild -eq 0 ]; then
 
 make download untar
 
@@ -58,6 +65,10 @@ for module in $modules; do
     echo DEST_MODULE_LOCATION["$num"]=/updates/dkms >> dkms.conf
     num=$((num+1))
 done
+
+else
+    rm -fr /usr/src/$NAME-$FULL_VERSION
+fi
 
 rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION >/dev/null
 
