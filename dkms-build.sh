@@ -1,6 +1,12 @@
 #!/bin/bash -eux
 
 # Script that produces the debian package of the drivers (dkms-binary-style)
+# Arguments:
+#   No option: assume virtual env, do everything
+#   a: "skip install"
+#   i: "install only, assume development environment"
+#   s: "skip install and stop processing after all files are prepared for compilation"
+#   r: "skip install and rebuild"
 
 NAME=snaptv-dddvb-analog
 VERSION=0.9.18
@@ -9,8 +15,17 @@ KERNEL_VERSION=3.13.0-61-lowlatency
 KERNEL_ARCH=x86_64
 
 rebuild=0
-# skip install if invoked with any argument (for development purposes)
+src_only=0
+install=0
 if [ $# -eq 0 ]; then
+    install=1
+else
+    [ "$1" == "i" ] && install=2
+    [ "$1" == "s" ] && src_only=1
+    [ "$1" == "r" ] && rebuild=1
+fi
+
+if [ $install -ge 1 ]; then
     apt-get update
     apt-get install -y \
             bzip2 \
@@ -23,14 +38,13 @@ if [ $# -eq 0 ]; then
             linux-headers-$KERNEL_VERSION \
             wget \
             curl
-    curl http://apt.snap.tv/bootstrap.sh | sh -s master
-    apt-get update
+    if [ $install -eq 1 ]; then
+        curl http://apt.snap.tv/bootstrap.sh | sh -s master
+        apt-get update
+    fi
     apt-get install -y \
             snaptv-package-builder
-else
-    if [ "$1" == "r" ]; then
-        rebuild=1
-    fi
+    [ $install -eq 2 ] && exit
 fi
 
 HASH=$(git describe --dirty --always)
@@ -65,11 +79,13 @@ for module in $modules; do
     echo DEST_MODULE_LOCATION["$num"]=/updates/dkms >> dkms.conf
     num=$((num+1))
 done
+[ $src_only -eq 1 ] && exit
 
 else
     rm -fr /usr/src/$NAME-$FULL_VERSION
 fi
 
+echo rsync all files including patching to /usr/src/$NAME-$FULL_VERSION
 rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION >/dev/null
 
 # copy template
