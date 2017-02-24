@@ -10,7 +10,6 @@
 #   c: clean
 
 if [ "$EUID" -ne 0 ] ; then echo "Please run as root"; exit; fi
-if [ "$1" == "c" ]   ; then git clean -fd; git reset --hard; exit; fi
 
 NAME=snaptv-dddvb-analog
 VERSION=0.9.18
@@ -29,6 +28,11 @@ if [ $# -eq 0 ]; then
     patch_src=1
     rebuild=1
 else
+    if [ "$1" == "c" ]; then
+        git clean -fd
+        git reset --hard
+        exit
+    fi
     [ "$1" == "i" ] && install=2
     [ "$1" == "s" ] && fetch_src=1
     [ "$1" == "p" ] && patch_src=1
