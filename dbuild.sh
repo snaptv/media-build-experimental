@@ -1,12 +1,14 @@
 #!/bin/bash -eux
 
+if [ "$EUID" -ne 0 ] ; then echo "Please run as root"; exit; fi
+
 HTTP_ROOT=/var/www/html
 CURL_NAME=dkms.sh
 touch $HTTP_ROOT/$CURL_NAME
 
 # Script that produces the debian package and moves it to be curled from test-servers later
 
-dkms_opt="a"
+dkms_opt_p=0
 
 if [ $# -gt 0 ]; then
     if [ "$1" == "clean" ]; then
@@ -14,27 +16,12 @@ if [ $# -gt 0 ]; then
         git reset --hard
         exit
     fi
-    if [ "$1" == "rebuild" ]; then
-        dkms_opt="r"
-    fi
+    [ "$1" == "patch" ] && dkms_opt_p=1
 fi
 
-CHANGES=$(git status --porcelain)
+[ $dkms_opt_p -eq 1 ] && ./dkms-build.sh p
+./dkms-build.sh r
 
-if [ "s$CHANGES" != "s" ]; then
-    if [ $dkms_opt == "a" ]; then
-        echo Warning: Repo must be clean - run './dbuild.sh clean' to clean or './dbuild.sh rebuild' to build again
-        exit
-    fi
-else
-    if [ $dkms_opt == "r" ]; then
-        echo Warning: Cannot rebuild a clean repo
-        exit
-    fi
-fi
-
-
-./dkms-build.sh $dkms_opt
 set +x && DEB=$(find ~/*.deb -newer $0) && set -x
 DEBNAME=$(basename $DEB)
 mv $DEB $HTTP_ROOT/dkms
