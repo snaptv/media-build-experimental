@@ -2,11 +2,15 @@
 
 # Script that produces the debian package of the drivers (dkms-binary-style)
 # Arguments:
-#   No option: assume virtual env, do everything
-#   a: "skip install"
+#   No option: assume virtual env, do everything except fetching external repos
 #   i: "install only, assume development environment"
-#   s: "skip install and stop processing after all files are prepared for compilation"
-#   r: "skip install and rebuild"
+#   s: "Fetch external repo"
+#   p: "Patch sources so they are prepared for compilation"
+#   r: "build - rebuild"
+#   c: clean
+
+if [ "$EUID" -ne 0 ] ; then echo "Please run as root"; exit; fi
+if [ "$1" == "c" ]   ; then git clean -fd; git reset --hard; exit; fi
 
 NAME=snaptv-dddvb-analog
 VERSION=0.9.18
@@ -14,16 +18,24 @@ VERSION=0.9.18
 KERNEL_VERSION=3.13.0-61-lowlatency
 KERNEL_ARCH=x86_64
 
-rebuild=0
-src_only=0
 install=0
+fetch_src=0
+patch_src=0
+rebuild=0
+
 if [ $# -eq 0 ]; then
     install=1
+    fetch_src=0
+    patch_src=1
+    rebuild=1
 else
     [ "$1" == "i" ] && install=2
-    [ "$1" == "s" ] && src_only=1
+    [ "$1" == "s" ] && fetch_src=1
+    [ "$1" == "p" ] && patch_src=1
     [ "$1" == "r" ] && rebuild=1
 fi
+
+echo i $install s $fetch_src p $patch_src r $rebuild
 
 if [ $install -ge 1 ]; then
     apt-get update
@@ -56,13 +68,28 @@ FULL_VERSION=$VERSION-snaptv-$LONGVER
 ID=$NAME/$FULL_VERSION
 LIB_DIR=/var/lib/dkms/$ID
 
-if [ $rebuild -eq 0 ]; then
+if [ $fetch_src -eq 1 ]; then
 
+# files are fetched from external repos and stored in /linux and /experimental/v4l-dvb-saa716x
+
+rm -r linux
+rm -r experimental/v4l-dvb-saa716x
+cp -r linux-init linux
 make download untar
+rm -r $(find -name .hg)
+rm linux/linux-media.tar.bz2*
+
+fi
+
+if [ $patch_src -eq 1 ]; then
 
 for file in $(find patches -type f | sort) ; do
     patch -p1 <$file
 done
+
+fi
+
+if [ $rebuild -eq 1 ]; then
 
 modules=$(cat modules)
 
@@ -79,14 +106,9 @@ for module in $modules; do
     echo DEST_MODULE_LOCATION["$num"]=/updates/dkms >> dkms.conf
     num=$((num+1))
 done
-[ $src_only -eq 1 ] && exit
-
-else
-    rm -fr /usr/src/$NAME-$FULL_VERSION
-fi
 
 echo rsync all files including patching to /usr/src/$NAME-$FULL_VERSION
-rsync -uav --exclude=.git --exclude=.hg ./ /usr/src/$NAME-$FULL_VERSION >/dev/null
+rsync -uav --exclude=.git --delete-excluded ./ /usr/src/$NAME-$FULL_VERSION >/dev/null
 
 # copy template
 sudo rsync -uav /etc/dkms/template-dkms-mkdeb/ /usr/src/$NAME-$FULL_VERSION/$NAME-dkms-mkdeb/
@@ -121,3 +143,5 @@ popd
 dkms remove $ID -k $KERNEL_VERSION
 rm -fr /usr/src/"$NAME"-"$FULL_VERSION"
 rm -fr ~/"$HASH"
+
+fi
